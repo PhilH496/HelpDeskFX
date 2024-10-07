@@ -24,11 +24,11 @@ public class Main extends Application {
 		try {
 			BorderPane root = new BorderPane();
             login loginScene = new login();
-            CreateAccount createAccountScene = new CreateAccount();
+            CreateAccount user = new CreateAccount();
 
-            //Set automatically to be at the login page. Sets up basics
+            //Set automatically to be at the login page. Just setting up basics
             primaryStage.setTitle("Learning Platform"); 
-            primaryStage.setScene(loginScene.getScene(primaryStage, createAccountScene));
+            primaryStage.setScene(loginScene.getScene(primaryStage, user));
             primaryStage.show();
 		} catch(Exception e) {
 			e.printStackTrace();

@@ -15,46 +15,45 @@ import javafx.scene.control.TextArea;
 public class CreateAccount {
     
     public Scene getScene(Stage primaryStage) {
-        // Title
-        Label createAccount = new Label("Create Your Account");
+
+       Label createAccount = new Label("Create Your Account");
        createAccount.setStyle("-fx-font-weight: bold; -fx-font-size: 25px; -fx-font-family: 'Roboto';");
 
-        // Username area to fill
+        //This area includes the user class for people to goto
         Label userNameArea = new Label("Username");
-        TextField newUsernameField = new TextField();
-        newUsernameField.setPromptText("Choose a username");
-        newUsernameField.setMaxWidth(300);
+        TextField usernameField = new TextField();
+        usernameField.setPromptText("Choose a username");
+        usernameField.setMaxWidth(300);
 
-        // Password area to fill
+        // Password area for the 360 user to fill out
         Label passWordArea = new Label("Password");
-        PasswordField newPasswordField = new PasswordField();
-        newPasswordField.setPromptText("Choose a password");
-        newPasswordField.setMaxWidth(300);
+        PasswordField passField = new PasswordField();
+        passField.setPromptText("Choose a password");
+        passField.setMaxWidth(300);
         
-        // Invitation code area to fill
+        // Invitation code area so users can login in accordingly
         Label inviteLabel = new Label("Invitation Code");
         TextArea invitationArea = new TextArea();
         invitationArea.setPromptText("Invite Code");
-        invitationArea.setMaxHeight(25);    // Maximum height
-        invitationArea.setMinHeight(25);      // Minimum height
+        invitationArea.setMaxHeight(25); 
+        invitationArea.setMinHeight(25);  
         invitationArea.setMaxWidth(300);
 
-        // Back Button
+        // When we finish, we get transfered back to login page
         Button backButton = new Button("Finish Set Up");
         backButton.setMaxWidth(300);
 
-        // Event: Clicking "Back to Login" switches back to the login scene
+        
         backButton.setOnAction(e -> {
             login loginScene = new login();
-            primaryStage.setScene(loginScene.getScene(primaryStage, this));  // Return to the login scene
+            primaryStage.setScene(loginScene.getScene(primaryStage, this));
         });
 
-        // Setup using vbox
-        VBox createAccountLayout = new VBox(10);
-        createAccountLayout.setAlignment(Pos.CENTER);
-        createAccountLayout.setPadding(new Insets(20));
-        createAccountLayout.getChildren().addAll(createAccount, userNameArea, newUsernameField, passWordArea, newPasswordField, inviteLabel, invitationArea, backButton);
+      
+        VBox cb = new VBox(20);
+        cb.setAlignment(Pos.CENTER);
+        cb.getChildren().addAll(createAccount, userNameArea, usernameField, passWordArea, passField, inviteLabel, invitationArea, backButton);
 
-        return new Scene(createAccountLayout, 400, 400);
+        return new Scene(cb, 600, 600);
     }
 }

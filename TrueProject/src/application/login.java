@@ -14,47 +14,50 @@ import javafx.stage.Stage;
 
 public class login {
     
-    public Scene getScene(Stage primaryStage, CreateAccount createAccountScene) {
-        // Title
+    public Scene getScene(Stage primaryStage, CreateAccount AccScene) {
+
         Label title = new Label("Welcome to Learning Platform");
         title.setFont(new Font("Roboto", 25));
 
-        // Area for Username
+        // Create user field and also align left
         Label userName = new Label("Username");
+        HBox posit = new HBox(userName);
+        posit.setAlignment(Pos.CENTER_LEFT);
         TextField usernameField = new TextField();
         usernameField.setPromptText("Enter your username");
         usernameField.setMaxWidth(300);
 
-        // Area for Password
-        Label password = new Label("Password");
 
-        // Create an HBox and add the label
-        HBox hbox = new HBox(password);
-        
-        // Set alignment to left
-        hbox.setAlignment(Pos.CENTER_LEFT);
+
+        // Set alignment pass to left according to design
+        Label password = new Label("Password");
+        HBox diff = new HBox(password);
+        diff.setAlignment(Pos.CENTER_LEFT);
         PasswordField passwordField = new PasswordField();
         passwordField.setPromptText("Enter your password");
         passwordField.setMaxWidth(300);
         
-        // Sign-in Button
-        Button signInButton = new Button("Sign in");
-        signInButton.setMaxWidth(300);
-        signInButton.setStyle("-fx-background-color: blue; -fx-text-fill: white; -fx-font-size: 14px;");
+        // Sign-in button to navigate to the profile page and log in
+        Button signingInButt = new Button("Sign in");
+        signingInButt.setMaxWidth(300);
+        signingInButt.setStyle("-fx-background-color: blue; -fx-text-fill: white; -fx-font-size: 14px;");
 
-        // Create Account Button
-        Button createAccountButton = new Button("Create Account");
-        createAccountButton.setMaxWidth(300);
+        Button accButt = new Button("Create Account");
+        accButt.setMaxWidth(300);
 
-        // Event: Clicking "Create Account" switches to the Create Account Scene
-        createAccountButton.setOnAction(e -> primaryStage.setScene(createAccountScene.getScene(primaryStage)));
+        //Clicking the "Create Account" switches to the Create Account Scene where we can then finish up and go back to login and login
+        //Clicking Sign in will prompt us with a mini questionnaire
+        accButt.setOnAction(e -> primaryStage.setScene(AccScene.getScene(primaryStage)));
+        signingInButt.setOnAction(e -> {
+           Profile profileSc = new Profile();
+           primaryStage.setScene(profileSc.getScene(primaryStage));
+        });
 
-        // Layout setup
+
+        // Layout
         VBox layout = new VBox(20);
         layout.setAlignment(Pos.CENTER);
-        layout.setPadding(new Insets(20));
-        layout.getChildren().addAll(title, userName, usernameField, password, passwordField, signInButton, createAccountButton);
-
-        return new Scene(layout, 400, 400);
+        layout.getChildren().addAll(title, userName, usernameField, password, passwordField, signingInButt, accButt);
+        return new Scene(layout, 600, 600);
     }
 }
