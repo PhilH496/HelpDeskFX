@@ -8,6 +8,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.stage.Stage;
 import javafx.scene.control.TextArea;
@@ -24,16 +25,21 @@ public class CreateAccount {
         TextField usernameField = new TextField();
         usernameField.setPromptText("Choose a username");
         usernameField.setMaxWidth(300);
-
+        
+        Label passText = new Label();
+        passText.setText("At least one uppercase and lowercase letter, one digit,"
+        		+ "\nspecial character, and a minimum of 8 characters long");
+        
         // Password area for the 360 user to fill out
         Label passWordArea = new Label("Password");
         PasswordField passField = new PasswordField();
         passField.setPromptText("Choose a password");
         passField.setMaxWidth(300);
-        
+
         PasswordField passFieldTwo = new PasswordField();
         passFieldTwo.setPromptText("Confirm Password");
         passFieldTwo.setMaxWidth(300);
+        
         
         // Invitation code in case someone gets a link from the admin
         Label inviteLabel = new Label("OR Invitation Code");
@@ -46,17 +52,56 @@ public class CreateAccount {
         // When we finish, we get transfered back to login page
         Button backButton = new Button("Finish Set Up");
         backButton.setMaxWidth(300);
-
+        
+        Label alert = new Label();
+        Label alertUser = new Label();
+        String OTP = AdminHomePage.OTP();
        
         backButton.setOnAction(e -> {
+        	alertUser.setText("");
+        	alert.setText("");
+        	String confirm = passField.getText();
+        	String confirmTwo = passFieldTwo.getText();
+        	String correctness = PasswordEvaluationTestingAutomation.performTestCase(1, confirm, true);
+        	String name = usernameField.getText();
+        	String nameCorrectness = UserNameRecognizer.checkForValidUserName(name);
+        	String inviteText = invitationArea.getText();
+        	
+        	//System.out.println(confirm);
+        	//System.out.println(confirmTwo);
+        	if (inviteText.equals(OTP))
+        	{
+                login loginScene = new login();
+                primaryStage.setScene(loginScene.getScene(primaryStage));
+        	}
+        	else if (!nameCorrectness.equals(""))
+        	{
+        		alertUser.setTextFill(Color.RED);
+                alertUser.setText(nameCorrectness);
+                
+        	}
+        	else if (!confirm.equals(confirmTwo))
+        	{
+        		alert.setTextFill(Color.RED);
+                alert.setText("Password does not match!");
+                
+        	}
+        	else if (!correctness.equals(""))
+        	{
+        		alert.setTextFill(Color.RED);
+        		alert.setText(correctness);
+        	}
+        	else
+        	{
             login loginScene = new login();
-            primaryStage.setScene(loginScene.getScene(primaryStage, this));
+            primaryStage.setScene(loginScene.getScene(primaryStage));
+        	}
         });
       
         VBox cb = new VBox(20);
         cb.setAlignment(Pos.CENTER);
-        cb.getChildren().addAll(createAccount, userNameArea, usernameField, passWordArea, passField,
-        		passFieldTwo, inviteLabel, invitationArea, backButton);
+        cb.getChildren().addAll(createAccount, userNameArea, usernameField, alertUser, passText, passWordArea, passField,
+        		passFieldTwo, alert, inviteLabel, invitationArea, backButton);
 
         return new Scene(cb, 600, 600);
     }

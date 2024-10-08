@@ -31,8 +31,23 @@ public class AdminHomePage {
 
 	        ChoiceDialog<String> type = new ChoiceDialog<>("Student", roles);
 	        type.setContentText("Select a role:");
+	        
+	        TextInputDialog emailTalk = new TextInputDialog();
+	        
+	        emailTalk.setHeaderText("Email:");
+	        Optional<String> emailOut = emailTalk.showAndWait();
+	        emailOut.ifPresent(email -> System.out.println("Email: " + email));
 	        Optional<String> out = type.showAndWait();
-	        out.ifPresent(role -> System.out.println("Selected role: " + role));
+	        out.ifPresent(role -> System.out.println("Select your role: " + role));
+	        
+	}
+	static String OTP()
+	{
+		Random random = new Random();
+    	int OTP = random.nextInt(100000);
+    	String OTPNew = String.valueOf(OTP);
+    	System.out.println("OTP: " + OTPNew);
+    	return OTPNew;
 	}
 	
     public Scene getScene(Stage primaryStage) {
@@ -40,22 +55,28 @@ public class AdminHomePage {
     	AdminPage.setStyle("-fx-font-weight: bold; -fx-font-size: 30px; -fx-font-family: 'Roboto';");
     	
     	Button inviteUser = new Button("Invite User"); // needs to give user a role when using invite code
-        inviteUser.setMaxWidth(300);   
-    	
+        inviteUser.setMaxWidth(500);   
+        inviteUser.setMinHeight(50);
+
     	Button passReset = new Button("Manage Password Reset");
-        passReset.setMaxWidth(300);    		
+        passReset.setMaxWidth(500);    	
+        passReset.setMinHeight(50);
         
     	Button deleteUser = new Button("Delete User");
-    	deleteUser.setMaxWidth(300); 
+    	deleteUser.setMaxWidth(500); 
+    	deleteUser.setMinHeight(50);
         
     	Button listUsers = new Button("List Users");
-    	listUsers.setMaxWidth(300);   
+    	listUsers.setMaxWidth(500);   
+    	listUsers.setMinHeight(50);
         
     	Button roleManip = new Button("Role Manipulation");
-    	roleManip.setMaxWidth(300);   
+    	roleManip.setMaxWidth(500);   
+    	roleManip.setMinHeight(50);
         
     	Button logout = new Button("Logout");
-    	logout.setMaxWidth(300);   
+    	logout.setMaxWidth(500);   
+    	logout.setMinHeight(50);
  
         listUsers.setOnAction(e -> {
             System.out.println("Users");
@@ -75,23 +96,21 @@ public class AdminHomePage {
         });
         
         inviteUser.setOnAction(e -> {
-        	Random random = new Random();
-        	int OTP = random.nextInt(100000);
         	roleType();
-        	System.out.println("OTP: " + OTP);
-
+        	OTP();
         });
         
         
         logout.setOnAction(e -> {
             login loginPart = new login();
-            primaryStage.setScene(loginPart.getScene(primaryStage, null));
+            primaryStage.setScene(loginPart.getScene(primaryStage));
         });
        
         passReset.setOnAction(e -> {
             PassReset pass = new PassReset();
             primaryStage.setScene(pass.getScene(primaryStage));
         });
+        
     	
         VBox cb = new VBox(20);
         cb.setAlignment(Pos.TOP_CENTER);

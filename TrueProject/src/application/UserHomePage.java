@@ -60,7 +60,7 @@ public class UserHomePage {
         
         logout.setOnAction(e -> {
             login loginPart = new login();
-            primaryStage.setScene(loginPart.getScene(primaryStage, null));
+            primaryStage.setScene(loginPart.getScene(primaryStage));
         });
         
         return new Scene(root, 800, 600);

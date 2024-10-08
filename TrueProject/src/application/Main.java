@@ -1,5 +1,7 @@
 package application;
-	
+import java.sql.SQLException;
+import java.util.Scanner;
+
 import javafx.application.Application;
 import javafx.stage.Stage;
 import javafx.scene.Scene;
@@ -17,8 +19,8 @@ import javafx.stage.Stage;
 import javafx.scene.layout.HBox;
 
 
-
 public class Main extends Application {
+	
 	@Override
 	public void start(Stage primaryStage) {
 		try {
@@ -28,7 +30,7 @@ public class Main extends Application {
 
             //Set automatically to be at the login page. Just setting up basics
             primaryStage.setTitle("Learning Platform"); 
-            primaryStage.setScene(loginScene.getScene(primaryStage, user));
+            primaryStage.setScene(loginScene.getScene(primaryStage));
             primaryStage.show();
 		} catch(Exception e) {
 			e.printStackTrace();
@@ -40,4 +42,5 @@ public class Main extends Application {
 	public static void main(String[] args) {
 		launch(args);
 	}
+	
 }

@@ -12,9 +12,10 @@ import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
 import javafx.stage.Stage;
 
+
 public class login {
     
-    public Scene getScene(Stage primaryStage, CreateAccount AccScene) {
+    public Scene getScene(Stage primaryStage) {
 
         Label title = new Label("Welcome to Learning Platform");
         title.setFont(new Font("Roboto", 25));
@@ -47,7 +48,11 @@ public class login {
 
         //Clicking the "Create Account" switches to the Create Account Scene where we can then finish up and go back to login and login
         //Clicking Sign in will prompt us with a mini questionnaire about ourselves
-        accButt.setOnAction(e -> primaryStage.setScene(AccScene.getScene(primaryStage)));
+        accButt.setOnAction(e -> {
+        CreateAccount acc = new CreateAccount();
+        primaryStage.setScene(acc.getScene(primaryStage));
+        });
+        
         signingInButt.setOnAction(e -> {
            Profile profileSc = new Profile();
            primaryStage.setScene(profileSc.getScene(primaryStage));
