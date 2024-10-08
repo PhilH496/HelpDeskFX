@@ -12,7 +12,6 @@ import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
 import javafx.stage.Stage;
 
-
 public class UserHomePage {
     public Scene getScene(Stage primaryStage) {
     	

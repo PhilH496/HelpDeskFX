@@ -43,12 +43,11 @@ public class CreateAccount {
         Button backButton = new Button("Finish Set Up");
         backButton.setMaxWidth(300);
 
-        
+       
         backButton.setOnAction(e -> {
             login loginScene = new login();
             primaryStage.setScene(loginScene.getScene(primaryStage, this));
         });
-
       
         VBox cb = new VBox(20);
         cb.setAlignment(Pos.CENTER);

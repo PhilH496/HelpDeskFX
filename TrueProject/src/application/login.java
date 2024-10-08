@@ -46,7 +46,7 @@ public class login {
         accButt.setMaxWidth(300);
 
         //Clicking the "Create Account" switches to the Create Account Scene where we can then finish up and go back to login and login
-        //Clicking Sign in will prompt us with a mini questionnaire
+        //Clicking Sign in will prompt us with a mini questionnaire about ourselves
         accButt.setOnAction(e -> primaryStage.setScene(AccScene.getScene(primaryStage)));
         signingInButt.setOnAction(e -> {
            Profile profileSc = new Profile();

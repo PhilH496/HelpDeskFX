@@ -41,7 +41,6 @@ public class Profile {
             primaryStage.setScene(instru.getScene(primaryStage));
         });
 
-
         
     	 
        

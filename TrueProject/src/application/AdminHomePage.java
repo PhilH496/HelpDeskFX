@@ -18,7 +18,7 @@ public class AdminHomePage {
         Button passReset = new Button("Manage Password Reset");
         passReset.setMaxWidth(300);
 
-        
+       
         passReset.setOnAction(e -> {
             PassReset pass = new PassReset();
             primaryStage.setScene(pass.getScene(primaryStage));
