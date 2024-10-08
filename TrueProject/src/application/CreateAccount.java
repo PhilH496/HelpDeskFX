@@ -31,8 +31,12 @@ public class CreateAccount {
         passField.setPromptText("Choose a password");
         passField.setMaxWidth(300);
         
-        // Invitation code area so users can login in accordingly
-        Label inviteLabel = new Label("Invitation Code");
+        PasswordField passFieldTwo = new PasswordField();
+        passFieldTwo.setPromptText("Confirm Password");
+        passFieldTwo.setMaxWidth(300);
+        
+        // Invitation code in case someone gets a link from the admin
+        Label inviteLabel = new Label("OR Invitation Code");
         TextArea invitationArea = new TextArea();
         invitationArea.setPromptText("Invite Code");
         invitationArea.setMaxHeight(25); 
@@ -51,7 +55,8 @@ public class CreateAccount {
       
         VBox cb = new VBox(20);
         cb.setAlignment(Pos.CENTER);
-        cb.getChildren().addAll(createAccount, userNameArea, usernameField, passWordArea, passField, inviteLabel, invitationArea, backButton);
+        cb.getChildren().addAll(createAccount, userNameArea, usernameField, passWordArea, passField,
+        		passFieldTwo, inviteLabel, invitationArea, backButton);
 
         return new Scene(cb, 600, 600);
     }
