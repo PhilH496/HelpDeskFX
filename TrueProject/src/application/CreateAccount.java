@@ -116,6 +116,7 @@ public class CreateAccount {
         	{
         		alertUser.setTextFill(Color.RED);
                 alertUser.setText(nameCorrectness);
+                System.out.print(alertUser.getText());
                 
         	}
         	else if (!confirm.equals(confirmTwo))
