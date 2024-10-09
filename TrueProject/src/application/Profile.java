@@ -2,14 +2,13 @@ package application;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
-import javafx.scene.text.Font;
 import javafx.stage.Stage;
-import javafx.scene.layout.StackPane;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
 
 public class Profile {
-    public Scene getScene(Stage primaryStage) {
+	
+    public Scene getScene(Stage primaryStage, String roleKind) {
         VBox cb = new VBox(40);
         cb.setPadding(new Insets(40));
         cb.setAlignment(Pos.TOP_LEFT);
@@ -40,17 +39,7 @@ public class Profile {
         TextField preferArea = new TextField();
         preferArea.setMinHeight(20); 
         preferArea.setMaxWidth(300);        
-        Label Role = new Label("Role");
-        Role.setStyle("-fx-font-weight: bold; -fx-font-size: 20px; -fx-font-family: 'Roboto';");
-        RadioButton adminButton = new RadioButton("Admin");
-        RadioButton studentButton = new RadioButton("Student");
-        RadioButton instructorButton = new RadioButton("Instructor");
-        ToggleGroup roleGroup = new ToggleGroup();
-        instructorButton.setToggleGroup(roleGroup);
-        instructorButton.setToggleGroup(roleGroup);
-        instructorButton.setToggleGroup(roleGroup);
         
-    	
         
         Button studentPage = new Button("Finish Setting Up Profile (Student)");
         studentPage.setMaxWidth(300);
@@ -78,14 +67,29 @@ public class Profile {
             primaryStage.setScene(instru.getScene(primaryStage));
         });
 
-        
         ScrollPane scrolling = new ScrollPane(cb);
-        scrolling.setFitToWidth(true); // Ensure scroll pane resizes with the window    	 
+        scrolling.setFitToWidth(true); // Ensure scroll pane resizes with the window  
+        
+        cb.getChildren().addAll(profileFinish, FirstName, firstArea, MiddleName, middleArea, LastName, lastArea,
+       		 emailAddress, emailArea, preferredName, preferArea);		
+        		System.out.println(roleKind);
+   	 			if ("admin".equals(roleKind)) {
+   	 				cb.getChildren().addAll(adminPage, studentPage, teacherPage); 
+   	 			} 
+   	 			else if ("All".equals(roleKind)) {
+   	 				cb.getChildren().addAll(studentPage, teacherPage);  
+   	 			}
+   	 			else if ("Student".equals(roleKind))
+   	 			{
+   	 				cb.getChildren().addAll(studentPage);
+   	 			}
+   	 			else
+   	 			{
+   	 				cb.getChildren().addAll(teacherPage);
+   	 			}    
 
-         cb.getChildren().addAll(profileFinish, FirstName, firstArea, MiddleName, middleArea, LastName, lastArea,
-        		 emailAddress, emailArea, preferredName, preferArea, Role, studentButton, instructorButton, 
-        		 studentPage, adminPage, teacherPage);
 
          return new Scene(scrolling, 800, 800);
     }
+    
 }

@@ -1,6 +1,5 @@
 package application;
 
-import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
@@ -59,27 +58,31 @@ public class login {
            String email = usernameField.getText();
            String passw = passwordField.getText();
            DatabaseHelper dbHelper = new DatabaseHelper();
+           String roleOne = "admin";
+           String roleTwo = "Student";
+           String roleThree = "Instructor";
+           String roleFour = "All";
            try {
                // Connect to the database
                dbHelper.connectToDatabase();
                
-               // Perform login check
+               // Perform login check and goto either profile page or straight to home page or choose specific role
                
-               if (dbHelper.login(email, passw, "admin")) {
+               if (dbHelper.login(email, passw, roleOne)) {
             	   if (dbHelper.isProfileCompleted(email))
             	   {
             		   ChooseRole pageType = new ChooseRole();
-            		   primaryStage.setScene(pageType.getScene(primaryStage));
+            		   primaryStage.setScene(pageType.getScene(primaryStage, roleOne));
             	   }
             	   else
             	   {
                    Profile profileSc = new Profile();
                    dbHelper.markProfileCompleted(email);
-                   primaryStage.setScene(profileSc.getScene(primaryStage));
+                   primaryStage.setScene(profileSc.getScene(primaryStage, roleOne));
                    
             	   }
                } 
-               else if (dbHelper.login(email, passw, "Student"))
+               else if (dbHelper.login(email, passw, roleTwo))
                {
             	   if (dbHelper.isProfileCompleted(email))
             	   {
@@ -90,11 +93,11 @@ public class login {
             	   {
                    Profile profileSc = new Profile();
                    dbHelper.markProfileCompleted(email);
-                   primaryStage.setScene(profileSc.getScene(primaryStage));
+                   primaryStage.setScene(profileSc.getScene(primaryStage, roleTwo));
                    
             	   }        	   
                }
-               else if (dbHelper.login(email, passw, "Instructor"))
+               else if (dbHelper.login(email, passw, roleThree))
                {
             	   if (dbHelper.isProfileCompleted(email))
             	   {
@@ -105,26 +108,24 @@ public class login {
             	   {
                    Profile profileSc = new Profile();
                    dbHelper.markProfileCompleted(email);
-                   primaryStage.setScene(profileSc.getScene(primaryStage));
+                   primaryStage.setScene(profileSc.getScene(primaryStage, roleThree));
                    
-            	   }   	   
+            	   } 
                }
-               else if (dbHelper.login(email, passw, "All"))
+               else if (dbHelper.login(email, passw, roleFour))
                {
             	   if (dbHelper.isProfileCompleted(email))
             	   {
             		   ChooseRole pageType = new ChooseRole();
-            		   primaryStage.setScene(pageType.getScene(primaryStage));
+            		   primaryStage.setScene(pageType.getScene(primaryStage, roleFour));
             	   }
             	   else
             	   {
             		   Profile profileSc = new Profile();
             		   dbHelper.markProfileCompleted(email);
-                   	   primaryStage.setScene(profileSc.getScene(primaryStage));
-            		   ChooseRole pageType = new ChooseRole();
-            		   primaryStage.setScene(pageType.getScene(primaryStage));
+                   	   primaryStage.setScene(profileSc.getScene(primaryStage, roleFour));
                    
-            	   } 
+            	   }
                }
             	   
                else {
@@ -132,9 +133,9 @@ public class login {
                    userOrPass.setText("ERROR: Username or Password is incorrect");
                }
            } catch (SQLException ex) {
-               ex.printStackTrace(); // Handle any SQL errors here
+               ex.printStackTrace();
            } finally {
-               // Ensure the database connection is closed
+             
                dbHelper.closeConnection();
            }
         });

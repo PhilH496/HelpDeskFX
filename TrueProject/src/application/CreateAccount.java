@@ -70,11 +70,9 @@ public class CreateAccount {
         studentButton.setToggleGroup(roleGroup);
         instructorButton.setToggleGroup(roleGroup);
         all.setToggleGroup(roleGroup);
+        roleGroup.selectToggle(studentButton);
         
-        
-        
-        
-        
+
         // Invitation code in case someone gets a link from the admin
         Label inviteLabel = new Label("OR Invitation Code");
         TextArea invitationArea = new TextArea();
@@ -102,8 +100,10 @@ public class CreateAccount {
         	String name = usernameField.getText();
         	String nameCorrectness = UserNameRecognizer.checkForValidUserName(name);
         	String inviteText = invitationArea.getText();
+        	
         	RadioButton selectedRadioButton = (RadioButton) roleGroup.getSelectedToggle();
         	String roleType = selectedRadioButton.getText();
+        	
         	
         	//System.out.println(confirm);
         	//System.out.println(confirmTwo);

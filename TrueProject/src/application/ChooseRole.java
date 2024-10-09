@@ -15,7 +15,7 @@ import javafx.stage.Stage;
 import java.sql.SQLException;
 
 public class ChooseRole {
-	 public Scene getScene(Stage primaryStage) {
+	 public Scene getScene(Stage primaryStage, String roleKind) {
 		 
 		 	Label roleCall = new Label("Choose your role:");
 		 	roleCall.setStyle("-fx-font-weight: bold; -fx-font-size: 30px; -fx-font-family: 'Roboto';");
@@ -50,10 +50,16 @@ public class ChooseRole {
 	            UserHomePage userHome = new UserHomePage();
 	            primaryStage.setScene(userHome.getScene(primaryStage));
 	        });
-		 
+		    
 	        VBox cb = new VBox(20);
 	        cb.setAlignment(Pos.TOP_CENTER);
-	        cb.getChildren().addAll(roleCall, admin, instructor, student);
+	        cb.getChildren().addAll(roleCall);
+	       if (roleKind.equals("admin"))
+	       {
+	    	   cb.getChildren().addAll(admin);
+	       }
+
+	        cb.getChildren().addAll(instructor, student);
 
 	        return new Scene(cb, 600, 600);
 	 }

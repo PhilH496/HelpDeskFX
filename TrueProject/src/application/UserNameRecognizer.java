@@ -238,13 +238,13 @@ public class UserNameRecognizer {
 				}
 			// If there is more input, then it is not valid in a UserName
 			userNameRecognizerIndexofError = currentCharNdx;		// Copy the index of the current character;
-			userNameRecognizerErrorMessage += "Subsequence characters in a UserName must be A-Z, a-z, 0-9, or a period.\n";
+			userNameRecognizerErrorMessage += "Subsequence characters in a UserName must be A-Z, a-z, 0-9.\n";
 			return userNameRecognizerErrorMessage;
 
 		case 2:
 			// State 2 is not a final state, so we can return a very specific error message
 			userNameRecognizerIndexofError = currentCharNdx;		// Copy the index of the current character;
-			userNameRecognizerErrorMessage += "A UserName character after a period must be A-Z, a-z, 0-9.\n";
+			userNameRecognizerErrorMessage += "UserName must be A-Z, a-z, 0-9.\n";
 			return userNameRecognizerErrorMessage;
 			
 		default:

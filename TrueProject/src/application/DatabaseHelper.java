@@ -165,6 +165,7 @@ class DatabaseHelper {
 	    }
 	}
 	
+	
 	public void closeConnection() {
 		try{
 			if(statement!=null) statement.close(); 
