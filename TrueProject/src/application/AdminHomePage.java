@@ -129,7 +129,7 @@ public class AdminHomePage {
         	if (confirmation.isPresent() && confirmation.get() == ButtonType.OK) {
         		try {
         			databaseHelper.connectToDatabase();  
-        			//dbHelper.deleteUser(userId);   
+        			databaseHelper.deleteUser(userId);   
         			databaseHelper.closeConnection();    
         			
         			Alert successAlert = new Alert(Alert.AlertType.INFORMATION);

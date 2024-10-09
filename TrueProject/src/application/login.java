@@ -11,6 +11,7 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
 import javafx.stage.Stage;
+import java.sql.SQLException;
 
 
 public class login {
@@ -46,6 +47,7 @@ public class login {
         Button accButt = new Button("Create Account");
         accButt.setMaxWidth(300);
 
+        Label userOrPass = new Label();
         //Clicking the "Create Account" switches to the Create Account Scene where we can then finish up and go back to login and login
         //Clicking Sign in will prompt us with a mini questionnaire about ourselves
         accButt.setOnAction(e -> {
@@ -54,15 +56,94 @@ public class login {
         });
         
         signingInButt.setOnAction(e -> {
-           Profile profileSc = new Profile();
-           primaryStage.setScene(profileSc.getScene(primaryStage));
+           String email = usernameField.getText();
+           String passw = passwordField.getText();
+           DatabaseHelper dbHelper = new DatabaseHelper();
+           try {
+               // Connect to the database
+               dbHelper.connectToDatabase();
+               
+               // Perform login check
+               
+               if (dbHelper.login(email, passw, "admin")) {
+            	   if (dbHelper.isProfileCompleted(email))
+            	   {
+            		   ChooseRole pageType = new ChooseRole();
+            		   primaryStage.setScene(pageType.getScene(primaryStage));
+            	   }
+            	   else
+            	   {
+                   Profile profileSc = new Profile();
+                   dbHelper.markProfileCompleted(email);
+                   primaryStage.setScene(profileSc.getScene(primaryStage));
+                   
+            	   }
+               } 
+               else if (dbHelper.login(email, passw, "Student"))
+               {
+            	   if (dbHelper.isProfileCompleted(email))
+            	   {
+            		   UserHomePage userHome = new UserHomePage();
+            		   primaryStage.setScene(userHome.getScene(primaryStage));
+            	   }
+            	   else
+            	   {
+                   Profile profileSc = new Profile();
+                   dbHelper.markProfileCompleted(email);
+                   primaryStage.setScene(profileSc.getScene(primaryStage));
+                   
+            	   }        	   
+               }
+               else if (dbHelper.login(email, passw, "Instructor"))
+               {
+            	   if (dbHelper.isProfileCompleted(email))
+            	   {
+            		   InstructorPage instructorHome = new InstructorPage();
+            		   primaryStage.setScene(instructorHome.getScene(primaryStage));
+            	   }
+            	   else
+            	   {
+                   Profile profileSc = new Profile();
+                   dbHelper.markProfileCompleted(email);
+                   primaryStage.setScene(profileSc.getScene(primaryStage));
+                   
+            	   }   	   
+               }
+               else if (dbHelper.login(email, passw, "All"))
+               {
+            	   if (dbHelper.isProfileCompleted(email))
+            	   {
+            		   ChooseRole pageType = new ChooseRole();
+            		   primaryStage.setScene(pageType.getScene(primaryStage));
+            	   }
+            	   else
+            	   {
+            		   Profile profileSc = new Profile();
+            		   dbHelper.markProfileCompleted(email);
+                   	   primaryStage.setScene(profileSc.getScene(primaryStage));
+            		   ChooseRole pageType = new ChooseRole();
+            		   primaryStage.setScene(pageType.getScene(primaryStage));
+                   
+            	   } 
+               }
+            	   
+               else {
+                   userOrPass.setStyle("-fx-text-fill: red;");
+                   userOrPass.setText("ERROR: Username or Password is incorrect");
+               }
+           } catch (SQLException ex) {
+               ex.printStackTrace(); // Handle any SQL errors here
+           } finally {
+               // Ensure the database connection is closed
+               dbHelper.closeConnection();
+           }
         });
 
 
         // Layout
         VBox layout = new VBox(20);
         layout.setAlignment(Pos.CENTER);
-        layout.getChildren().addAll(title, userName, usernameField, password, passwordField, signingInButt, accButt);
+        layout.getChildren().addAll(title, userName, usernameField, password, passwordField, userOrPass, signingInButt, accButt);
         return new Scene(layout, 600, 600);
     }
 }

@@ -1,10 +1,5 @@
 package application;
 import java.sql.*;
-
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.ArrayList;
 
 
@@ -41,6 +36,8 @@ class DatabaseHelper {
 				+ "password VARCHAR(255), "
 				+ "role VARCHAR(20))";
 		statement.execute(userTable);
+	    String addProfileColumn = "ALTER TABLE cse360users ADD COLUMN IF NOT EXISTS profile_completed BOOLEAN DEFAULT FALSE";
+	    statement.execute(addProfileColumn);
 	}
 
 
@@ -148,6 +145,26 @@ class DatabaseHelper {
 	    }
 	}
 
+	public boolean isProfileCompleted(String email) throws SQLException {
+	    String query = "SELECT profile_completed FROM cse360users WHERE email = ?";
+	    try (PreparedStatement pstmt = connection.prepareStatement(query)) {
+	        pstmt.setString(1, email);
+	        ResultSet rs = pstmt.executeQuery();
+	        if (rs.next()) {
+	            return rs.getBoolean("profile_completed");
+	        }
+	    }
+	    return false; 
+	}
+	
+	public void markProfileCompleted(String email) throws SQLException {
+	    String query = "UPDATE cse360users SET profile_completed = TRUE WHERE email = ?";
+	    try (PreparedStatement pstmt = connection.prepareStatement(query)) {
+	        pstmt.setString(1, email);
+	        pstmt.executeUpdate();
+	    }
+	}
+	
 	public void closeConnection() {
 		try{
 			if(statement!=null) statement.close(); 
