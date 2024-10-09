@@ -23,6 +23,7 @@ public class Main extends Application {
 	
 	@Override
 	public void start(Stage primaryStage) {
+		
 		try {
 			BorderPane root = new BorderPane();
             login loginScene = new login();
@@ -32,13 +33,44 @@ public class Main extends Application {
             primaryStage.setTitle("Learning Platform"); 
             primaryStage.setScene(loginScene.getScene(primaryStage));
             primaryStage.show();
+            testDatabaseHelper();
 		} catch(Exception e) {
 			e.printStackTrace();
 		}
+		
 	}
+	
+	public void testDatabaseHelper() {
+        DatabaseHelper dbHelper = new DatabaseHelper();
+
+        try {
+            // Connect to the database
+            dbHelper.connectToDatabase();
+
+            // Check if the database is empty
+            if (dbHelper.isDatabaseEmpty()) {
+                System.out.println("Database is empty. Registering new users...");
+            } else {
+                System.out.println("Database already contains users. Registering additional user...");
+
+                // Register the second user even if the database is not empty
+            }
+
+            // Display all users as admin
+            System.out.println("Displaying all users (admin view):");
+            dbHelper.displayUsersByAdmin();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            // Close the database connection
+            dbHelper.closeConnection();
+        }
+    }
 	
 	//launch application
 	public static void main(String[] args) {
+		
 		launch(args);
 	}
 	
