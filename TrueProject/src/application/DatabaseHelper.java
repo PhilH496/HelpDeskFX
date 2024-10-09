@@ -5,6 +5,7 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.ArrayList;
 
 
 class DatabaseHelper {
@@ -112,7 +113,8 @@ class DatabaseHelper {
 		} 
 	}
 	
-	public void displayUsersByUser() throws SQLException{
+	public ArrayList<User> getAllUsers() throws SQLException{
+        ArrayList<User> users = new ArrayList<User>();
 		String sql = "SELECT * FROM cse360users"; 
 		Statement stmt = connection.createStatement();
 		ResultSet rs = stmt.executeQuery(sql); 
@@ -125,25 +127,37 @@ class DatabaseHelper {
 			String role = rs.getString("role");  
 
 			// Display values 
-			System.out.print("ID: " + id); 
-			System.out.print(", Age: " + email); 
-			System.out.print(", First: " + password); 
-			System.out.println(", Last: " + role); 
+			users.add(new User(id, email, password, role));
 		} 
+		return users;
 	}
-
+	
+	public void deleteUser(String email) throws SQLException {
+	    String deleteUserQuery = "DELETE FROM cse360users WHERE email = ?";
+	    try (PreparedStatement pstmt = connection.prepareStatement(deleteUserQuery)) {
+	        pstmt.setString(1, email);
+	        int rowsAffected = pstmt.executeUpdate();
+	        
+	        if (rowsAffected > 0) {
+	            System.out.println("User with email " + email + " deleted successfully.");
+	        } else {
+	            System.out.println("No user found with email " + email + ".");
+	        }
+	    } catch (SQLException e) {
+	        e.printStackTrace();
+	    }
+	}
 
 	public void closeConnection() {
-		try{ 
+		try{
 			if(statement!=null) statement.close(); 
-		} catch(SQLException se2) { 
+		} catch(SQLException se2) {
 			se2.printStackTrace();
-		} 
-		try { 
-			if(connection!=null) connection.close(); 
-		} catch(SQLException se){ 
-			se.printStackTrace(); 
+		}
+		try {
+			if(connection!=null) connection.close();
+		} catch(SQLException se){
+			se.printStackTrace();
 		} 
 	}
-
 }
