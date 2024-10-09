@@ -12,10 +12,15 @@ import javafx.scene.layout.Region;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.stage.Stage;
-
+/**
+ * The UserHomePage class creates the main user interface for the the user homepage.
+ * It includes a header, placeholder sections for courses, schedule, and messages, and a 
+ * placeholder for recent activity. The class also handles logout functionality by 
+ * switching back to the login screen. Reusable menu items are generated through a helper method.
+ */
 public class UserHomePage {
+	// Method to create and return the UI for the user homepage
     public Scene getScene(Stage primaryStage) {
-        // Header
         Label titleLabel = new Label("ASU Help System");
         titleLabel.setFont(Font.font("Roboto", FontWeight.BOLD, 20));
         
@@ -31,20 +36,13 @@ public class UserHomePage {
         header.setPadding(new Insets(10, 20, 10, 20));
         header.setStyle("-fx-background-color: #f0f0f0;");
 
-        // Main content
         VBox mainContent = new VBox(20);
         mainContent.setPadding(new Insets(20));
-
-        // My Courses
+        
         HBox coursesBox = createMenuItemBox("My Courses", "Access your enrolled courses");
-        
-        // Schedule
         HBox scheduleBox = createMenuItemBox("Schedule", "View upcoming classes");
-        
-        // Messages
         HBox messagesBox = createMenuItemBox("Messages", "Communicate with instructors");
 
-        // Recent Activity
         Label recentActivityLabel = new Label("Recent Activity");
         recentActivityLabel.setFont(Font.font("Roboto", FontWeight.BOLD, 16));
         
@@ -54,18 +52,18 @@ public class UserHomePage {
         
         mainContent.getChildren().addAll(coursesBox, scheduleBox, messagesBox, recentActivityLabel, activityList);
 
-        // Root layout
-        VBox root = new VBox();
-        root.getChildren().addAll(header, mainContent);
+        VBox contentBox = new VBox();
+        contentBox.getChildren().addAll(header, mainContent);
         
         logout.setOnAction(e -> {
             login loginPart = new login();
             primaryStage.setScene(loginPart.getScene(primaryStage));
         });
         
-        return new Scene(root, 800, 600);
+        return new Scene(contentBox, 800, 600);
     }
-
+    
+    // Helper method to create a box for each menu item
     private HBox createMenuItemBox(String title, String description) {
         VBox textBox = new VBox(5);
         Label titleLabel = new Label(title);
@@ -74,7 +72,7 @@ public class UserHomePage {
         descLabel.setStyle("-fx-text-fill: #666666;");
         textBox.getChildren().addAll(titleLabel, descLabel);
         
-        // White box that the title and escription nest in 
+        // Horizontal layout for the meny item box with padding and border styling
         HBox box = new HBox(15);
         box.setAlignment(Pos.CENTER_LEFT);
         box.getChildren().addAll(textBox);

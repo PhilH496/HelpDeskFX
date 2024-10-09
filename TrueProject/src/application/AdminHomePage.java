@@ -8,7 +8,6 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
-import javafx.scene.text.Font;
 import javafx.stage.Stage;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
@@ -21,10 +20,21 @@ import javafx.scene.control.ChoiceDialog;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.ButtonType;
-
+/**
+ * The AdminHomePage class creates the admin dashboard interface. 
+ * Key features include:
+ * - Inviting users to the system with assigned roles.
+ * - Managing password resets.
+ * - Deleting user accounts.
+ * - Viewing the list of registered users.
+ * - Changing user roles.
+ * 
+ * Each feature is linked to its respective action handler, and the class uses 
+ * the DatabaseHelper to interact with the database.
+ */
 public class AdminHomePage {
 	private static final DatabaseHelper databaseHelper = new DatabaseHelper();
-	
+	// Method to create and return the UI for the admin homepage
     public Scene getScene(Stage primaryStage) {
     	Label AdminPage = new Label("Admin Dashboard");
     	AdminPage.setStyle("-fx-font-weight: bold; -fx-font-size: 30px; -fx-font-family: 'Roboto';");
@@ -45,15 +55,15 @@ public class AdminHomePage {
     	listUsers.setMaxWidth(500);   
     	listUsers.setMinHeight(50);
     	
-    	Button roleManip = new Button("Role Manipulation");
-    	roleManip.setMaxWidth(500);   
-    	roleManip.setMinHeight(50);
+    	Button changeUserRoleButton = new Button("Role Manipulation");
+    	changeUserRoleButton.setMaxWidth(500);   
+    	changeUserRoleButton.setMinHeight(50);
     	
     	Button logout = new Button("Logout");
     	logout.setMaxWidth(500);   
     	logout.setMinHeight(50);
     	
-    	roleManip.setOnAction(e -> {
+    	changeUserRoleButton.setOnAction(e -> {
     		changeUserRole();
     	});
     	
@@ -79,13 +89,14 @@ public class AdminHomePage {
             primaryStage.setScene(loginPart.getScene(primaryStage));
         });
         
-        VBox cb = new VBox(20);
-        cb.setAlignment(Pos.TOP_CENTER);
-        cb.getChildren().addAll(AdminPage, inviteUser, passReset, deleteUser, listUsers, roleManip, logout);
+        VBox contentBox = new VBox(20);
+        contentBox.setAlignment(Pos.TOP_CENTER);
+        contentBox.getChildren().addAll(AdminPage, inviteUser, passReset, deleteUser, listUsers, changeUserRoleButton, logout);
 
-        return new Scene(cb, 600, 600);
+        return new Scene(contentBox, 600, 600);
     }
     
+    // Method to handle the deletion of a user's account
     public static void deleteUser() {
     	TextInputDialog text = new TextInputDialog();
     	text.setContentText("Please enter the username to delete their account:");
@@ -100,7 +111,7 @@ public class AdminHomePage {
         	// Wait for the user to respond
         	Optional<ButtonType> confirmation = confirming.showAndWait();
         	    
-        	// Check if OK was clicked and delete the user with the specified email
+        	// Check if OK was clicked and delete the user with the specified username
         	if (confirmation.isPresent() && confirmation.get() == ButtonType.OK) {
         		try {
         			databaseHelper.connectToDatabase();  
@@ -123,6 +134,7 @@ public class AdminHomePage {
         });
     }
     
+    // Method to display all users in a TableView object
     private static void displayUsers(Stage primaryStage) {
     	try {
     		databaseHelper.connectToDatabase();  
@@ -132,10 +144,10 @@ public class AdminHomePage {
 	        TableView<User> table = new TableView<>();
 	        
 	        TableColumn<User, Integer> idColumn = new TableColumn<>("ID");
-	        idColumn.setCellValueFactory(new PropertyValueFactory<>("ID"));
+	        idColumn.setCellValueFactory(new PropertyValueFactory<>("ID"));			 // Return the ID from the getID() method in User.java
 	        
 	        TableColumn<User, String> emailColumn = new TableColumn<>("Username");
-	        emailColumn.setCellValueFactory(new PropertyValueFactory<>("username"));
+	        emailColumn.setCellValueFactory(new PropertyValueFactory<>("username")); // Return the username from the getUsername() method 
 	        
 	        table.getColumns().addAll(idColumn, emailColumn);
 	        table.getItems().addAll(users);
@@ -158,7 +170,7 @@ public class AdminHomePage {
 		}
     }
     
-    //When inviting user, which role does the user have?
+    // Method to update user role in the database
   	private void inviteUser() {
   	    String password = PassReset.generateOTP();
 
@@ -180,7 +192,7 @@ public class AdminHomePage {
   	        if (out.isPresent()) {
   	            String role = out.get();
 
-  	            // Now register the user with the provided email, generated password, and selected role
+  	            // Register the user with the provided username, generated password, and selected role
   	            try {
   	                databaseHelper.connectToDatabase();
   	                databaseHelper.register(email, password, role);
@@ -200,7 +212,7 @@ public class AdminHomePage {
   	    }
   	}
   	
-  	
+  	// Method to handle user role change process
   	private void changeUserRole() {
   	    List<String> roles = new ArrayList<>();
   	    roles.add("Student");
@@ -213,11 +225,11 @@ public class AdminHomePage {
   	    emailTalk.setHeaderText("Enter the username of the user you wish to invite:");
 
   	    Optional<String> emailOut = emailTalk.showAndWait();
-  	    if (emailOut.isPresent()) {
+  	    if (emailOut.isPresent()) {							// If the email was entered
   	        String email = emailOut.get(); 
-
-  	        Optional<String> out = type.showAndWait();
-  	        if (out.isPresent()) {
+  	        
+  	        Optional<String> out = type.showAndWait();	
+  	        if (out.isPresent()) {							// If the role was chosen
   	            String role = out.get();
 
   	            // Change the role of the user
@@ -231,18 +243,18 @@ public class AdminHomePage {
   	                e.printStackTrace();
   	            }
   	        } else {
-  	        	Label successLabel = new Label("Role selection was canceled");
-                successLabel.setTextFill(Color.RED);
+  	        	Label roleInputCanceled = new Label("Role selection was canceled");
+  	        	roleInputCanceled.setTextFill(Color.RED);
   	        }
   	    } else {
-  	    	Label successLabel = new Label("Username input was canceled");
-	        successLabel.setTextFill(Color.RED);
+  	    	Label usernameInputCanceled = new Label("Username input was canceled");
+  	    	usernameInputCanceled.setTextFill(Color.RED);
   	    }
   	}
   	
+  	// Method to update user role in the database
   	private void updateUserRole(String role, String email) {
   		String sql = "UPDATE cse360users SET role = ? WHERE email = ?";
-        //Label alertLabel = new Label("");
 
         try {
             databaseHelper.connectToDatabase();
@@ -251,20 +263,18 @@ public class AdminHomePage {
                 pstmt.setString(2, email);
                 int affectedRows = pstmt.executeUpdate();
                 
-                if (affectedRows > 0) {
-                	Label alertLabel = new Label("Role succesfully changed to " + role);
-  	                alertLabel.setTextFill(Color.GREEN);
+                if (affectedRows > 0) { 		// Checks if theres information for that user
+                	Label successLabel = new Label("Role succesfully changed to " + role);
+                	successLabel.setTextFill(Color.GREEN);
                 } else {
-                	Label alertLabel = new Label("Role succesfully changed to " + role);
-                	alertLabel.setText("No user found with that username + " + email);
-                	alertLabel.setTextFill(Color.RED);
+                	Label failureLabel = new Label("No user found with that username + " + email);
+                	failureLabel.setTextFill(Color.RED);
                 }
             }
         } catch (SQLException e) {
             e.printStackTrace();
-        	Label alertLabel = new Label("Role succesfully changed to " + role);
-            alertLabel.setText("Error Changing Role");
-            alertLabel.setTextFill(Color.RED);
+        	Label errorLabel = new Label("Error Changing Role");
+        	errorLabel.setTextFill(Color.RED);
         } finally {
             databaseHelper.closeConnection();
         }

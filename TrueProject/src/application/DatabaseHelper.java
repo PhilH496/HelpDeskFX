@@ -110,6 +110,7 @@ class DatabaseHelper {
 		} 
 	}
 	
+	// Method to return all users stored in the database into an ArrayList
 	public ArrayList<User> getAllUsers() throws SQLException{
         ArrayList<User> users = new ArrayList<User>();
 		String sql = "SELECT * FROM cse360users"; 
@@ -129,6 +130,7 @@ class DatabaseHelper {
 		return users;
 	}
 	
+	// Method to delete user from the database
 	public void deleteUser(String email) throws SQLException {
 	    String deleteUserQuery = "DELETE FROM cse360users WHERE email = ?";
 	    try (PreparedStatement pstmt = connection.prepareStatement(deleteUserQuery)) {
@@ -179,6 +181,7 @@ class DatabaseHelper {
 		} 
 	}
 	
+	// Method to return connection
 	public Connection getConnection() {
 		return this.connection;
 	}

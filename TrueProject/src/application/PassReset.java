@@ -14,11 +14,20 @@ import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.stage.Stage;
 import javafx.scene.paint.Color;
-
+/**
+ * The PassReset class handles the functionality for resetting user passwords.
+ * It provides an interface for admins to send a One-Time Password (OTP) to users via email.
+ * Key features include:
+ * - UI for entering a user's email to send a password reset link.
+ * - Generation of a random 8-digit OTP.
+ * - Updating the database with the new OTP and notifying the user.
+ * 
+ * This class utilizes DatabaseHelper to interact with the database.
+ */
 public class PassReset {
 	static final String DB_URL = "jdbc:h2:~/firstDatabase";  
 	private static final DatabaseHelper databaseHelper = new DatabaseHelper();
-	
+	// Method to create and return the UI for the password reset page
     public Scene getScene(Stage primaryStage) {
     	Label titleLabel = new Label("Reset User Password");
         titleLabel.setFont(Font.font("Roboto", FontWeight.BOLD, 24));
@@ -57,6 +66,7 @@ public class PassReset {
         return new Scene(contentBox, 600, 400);
     }
     
+    // Generate a random 8-digit One Time Password(OTP)
     static String generateOTP() {
         Random rand = new Random();
         StringBuilder otp = new StringBuilder(8);
@@ -66,6 +76,7 @@ public class PassReset {
         return otp.toString();
     }
     
+    // Send OTP to user's email and update the database
     private static void sendOTP(String email, Label alertLabel) {
         String sql = "UPDATE cse360users SET password = ? WHERE email = ?";
         String oneTimePassword = generateOTP();
@@ -77,7 +88,7 @@ public class PassReset {
                 pstmt.setString(2, email);
                 int affectedRows = pstmt.executeUpdate();
                 
-                if (affectedRows > 0) {
+                if (affectedRows > 0) {									// Checks if theres information for that user
                     System.out.println("User OTP: " + oneTimePassword); // "Send" to user's email
                     alertLabel.setText("One Time Password Successfully sent");
                     alertLabel.setTextFill(Color.GREEN);

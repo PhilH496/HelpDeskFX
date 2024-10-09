@@ -5,20 +5,20 @@ import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
-import javafx.scene.control.PasswordField;
-import javafx.scene.control.TextField;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
-import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.stage.Stage;
-
+/**
+ * The UserHomePage class creates the main user interface for the the instructor homepage.
+ * The class also handles logout functionality by switching back to the login screen.
+ */
 public class InstructorPage {
+	// Method to create and return the UI for the instructor homepage
     public Scene getScene(Stage primaryStage) {
-        // Header
         Label titleLabel = new Label("ASU Help System");
         titleLabel.setFont(Font.font("Roboto", FontWeight.BOLD, 20));
         
@@ -34,7 +34,6 @@ public class InstructorPage {
         header.setPadding(new Insets(10, 20, 10, 20));
         header.setStyle("-fx-background-color: #f0f0f0;");
 
-        // Main content
         VBox mainContent = new VBox(20);
         mainContent.setPadding(new Insets(20));
         
@@ -44,15 +43,14 @@ public class InstructorPage {
         
         mainContent.getChildren().addAll(activityList);
 
-        // Root layout
-        VBox root = new VBox();
-        root.getChildren().addAll(header, mainContent);
+        VBox contentBox = new VBox();
+        contentBox.getChildren().addAll(header, mainContent);
         
         logout.setOnAction(e -> {
             login loginPart = new login();
             primaryStage.setScene(loginPart.getScene(primaryStage));
         });
         
-        return new Scene(root, 800, 600);
+        return new Scene(contentBox, 800, 600);
     }
 }
