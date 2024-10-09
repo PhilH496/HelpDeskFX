@@ -30,7 +30,7 @@ public class Main extends Application {
             CreateAccount user = new CreateAccount();
 
             //Set automatically to be at the login page. Just setting up basics
-            primaryStage.setTitle("Learning Platform"); 
+            primaryStage.setTitle("ASU Help System"); 
             primaryStage.setScene(loginScene.getScene(primaryStage));
             primaryStage.show();
             testDatabaseHelper();

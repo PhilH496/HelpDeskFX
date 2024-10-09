@@ -88,7 +88,7 @@ public class AdminHomePage {
     
     public static void deleteUser() {
     	TextInputDialog text = new TextInputDialog();
-    	text.setContentText("Please enter the user's email to delete their account:");
+    	text.setContentText("Please enter the username to delete their account:");
     	
     	Optional<String> confirm = text.showAndWait();
 
@@ -170,7 +170,7 @@ public class AdminHomePage {
   	    type.setContentText("Select a role:");
 
   	    TextInputDialog emailTalk = new TextInputDialog();
-  	    emailTalk.setHeaderText("Enter the email of the user you wish to invite:");
+  	    emailTalk.setHeaderText("Enter the username of the user you wish to invite:");
 
   	    Optional<String> emailOut = emailTalk.showAndWait();
   	    if (emailOut.isPresent()) {
@@ -195,7 +195,7 @@ public class AdminHomePage {
                 successLabel.setTextFill(Color.RED);
   	        }
   	    } else {
-  	    	Label successLabel = new Label("Email input was canceled");
+  	    	Label successLabel = new Label("Username input was canceled");
 	        successLabel.setTextFill(Color.RED);
   	    }
   	}
@@ -210,7 +210,7 @@ public class AdminHomePage {
   	    type.setContentText("Select a role:");
 
   	    TextInputDialog emailTalk = new TextInputDialog();
-  	    emailTalk.setHeaderText("Enter the email of the user you wish to invite:");
+  	    emailTalk.setHeaderText("Enter the username of the user you wish to invite:");
 
   	    Optional<String> emailOut = emailTalk.showAndWait();
   	    if (emailOut.isPresent()) {
@@ -235,7 +235,7 @@ public class AdminHomePage {
                 successLabel.setTextFill(Color.RED);
   	        }
   	    } else {
-  	    	Label successLabel = new Label("Email input was canceled");
+  	    	Label successLabel = new Label("Username input was canceled");
 	        successLabel.setTextFill(Color.RED);
   	    }
   	}
