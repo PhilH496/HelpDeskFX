@@ -19,7 +19,7 @@ public class UserHomePage {
         Label titleLabel = new Label("ASU Help System");
         titleLabel.setFont(Font.font("Roboto", FontWeight.BOLD, 20));
         
-        Label welcomeLabel = new Label("Welcome, John Doe");
+        Label welcomeLabel = new Label("Welcome, Student");
         Button logout = new Button("Logout");
         
         Region spacer = new Region();

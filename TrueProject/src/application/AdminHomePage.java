@@ -1,9 +1,5 @@
 package application;
 
-import java.util.Random;
-
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
@@ -11,13 +7,15 @@ import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
+import javafx.scene.text.Font;
 import javafx.stage.Stage;
+import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import javafx.scene.control.TextInputDialog;
 import javafx.scene.control.cell.PropertyValueFactory;
-
 import java.util.Optional;
 import javafx.scene.control.ChoiceDialog;
 import javafx.scene.control.Alert;
@@ -26,37 +24,11 @@ import javafx.scene.control.ButtonType;
 
 public class AdminHomePage {
 	private static final DatabaseHelper databaseHelper = new DatabaseHelper();
-
-	//When inviting user, which role does the user have?
-	private void roleType() {
-	        List<String> roles = new ArrayList<>();
-	        roles.add("Student");
-	        roles.add("Instructor");
-
-	        ChoiceDialog<String> type = new ChoiceDialog<>("Student", roles);
-	        type.setContentText("Select a role:");
-	        
-	        TextInputDialog emailTalk = new TextInputDialog();
-	        
-	        emailTalk.setHeaderText("Email:");
-	        Optional<String> emailOut = emailTalk.showAndWait();
-	        emailOut.ifPresent(email -> System.out.println("Email: " + email));
-	        Optional<String> out = type.showAndWait();
-	        out.ifPresent(role -> System.out.println("Select your role: " + role));
-	}
-	
-	static String OTP() {
-		Random random = new Random();
-    	int OTP = random.nextInt(100000);
-    	String OTPNew = String.valueOf(OTP);
-    	System.out.println("OTP: " + OTPNew);
-    	return OTPNew;
-	}
 	
     public Scene getScene(Stage primaryStage) {
     	Label AdminPage = new Label("Admin Dashboard");
     	AdminPage.setStyle("-fx-font-weight: bold; -fx-font-size: 30px; -fx-font-family: 'Roboto';");
-    	
+        
     	Button inviteUser = new Button("Invite User"); 
         inviteUser.setMaxWidth(500);   
         inviteUser.setMinHeight(50);
@@ -81,6 +53,10 @@ public class AdminHomePage {
     	logout.setMaxWidth(500);   
     	logout.setMinHeight(50);
     	
+    	roleManip.setOnAction(e -> {
+    		changeUserRole();
+    	});
+    	
         listUsers.setOnAction(e -> {
         	displayUsers(primaryStage);
         });
@@ -90,13 +66,7 @@ public class AdminHomePage {
         });
         
         inviteUser.setOnAction(e -> {
-        	roleType();
-        	OTP();
-        });
-        
-        logout.setOnAction(e -> {
-            login loginPart = new login();
-            primaryStage.setScene(loginPart.getScene(primaryStage));
+        	inviteUser();
         });
        
         passReset.setOnAction(e -> {
@@ -104,6 +74,11 @@ public class AdminHomePage {
             primaryStage.setScene(pass.getScene(primaryStage));
         });
     	
+        logout.setOnAction(e -> {
+            login loginPart = new login();
+            primaryStage.setScene(loginPart.getScene(primaryStage));
+        });
+        
         VBox cb = new VBox(20);
         cb.setAlignment(Pos.TOP_CENTER);
         cb.getChildren().addAll(AdminPage, inviteUser, passReset, deleteUser, listUsers, roleManip, logout);
@@ -111,13 +86,13 @@ public class AdminHomePage {
         return new Scene(cb, 600, 600);
     }
     
-    private static void deleteUser() {
+    public static void deleteUser() {
     	TextInputDialog text = new TextInputDialog();
-    	text.setContentText("Please enter the user ID to delete:");
+    	text.setContentText("Please enter the user's email to delete their account:");
     	
     	Optional<String> confirm = text.showAndWait();
 
-        confirm.ifPresent(userId -> {
+        confirm.ifPresent(email -> {
         	// Create a confirmation alert dialog
         	Alert confirming = new Alert(AlertType.CONFIRMATION);
         	confirming.setHeaderText("Are you sure you want to delete this user?");
@@ -125,11 +100,11 @@ public class AdminHomePage {
         	// Wait for the user to respond
         	Optional<ButtonType> confirmation = confirming.showAndWait();
         	    
-        	// Check if OK was clicked and delete the user with the specified ID
+        	// Check if OK was clicked and delete the user with the specified email
         	if (confirmation.isPresent() && confirmation.get() == ButtonType.OK) {
         		try {
         			databaseHelper.connectToDatabase();  
-        			databaseHelper.deleteUser(userId);   
+        			databaseHelper.deleteUser(email);   
         			databaseHelper.closeConnection();    
         			
         			Alert successAlert = new Alert(Alert.AlertType.INFORMATION);
@@ -159,8 +134,8 @@ public class AdminHomePage {
 	        TableColumn<User, Integer> idColumn = new TableColumn<>("ID");
 	        idColumn.setCellValueFactory(new PropertyValueFactory<>("ID"));
 	        
-	        TableColumn<User, String> emailColumn = new TableColumn<>("Email");
-	        emailColumn.setCellValueFactory(new PropertyValueFactory<>("email"));
+	        TableColumn<User, String> emailColumn = new TableColumn<>("Username");
+	        emailColumn.setCellValueFactory(new PropertyValueFactory<>("username"));
 	        
 	        table.getColumns().addAll(idColumn, emailColumn);
 	        table.getItems().addAll(users);
@@ -182,4 +157,116 @@ public class AdminHomePage {
 			e1.printStackTrace();
 		}
     }
+    
+    //When inviting user, which role does the user have?
+  	private void inviteUser() {
+  	    String password = PassReset.generateOTP();
+
+  	    List<String> roles = new ArrayList<>();
+  	    roles.add("Student");
+  	    roles.add("Instructor");
+
+  	    ChoiceDialog<String> type = new ChoiceDialog<>("Student", roles);
+  	    type.setContentText("Select a role:");
+
+  	    TextInputDialog emailTalk = new TextInputDialog();
+  	    emailTalk.setHeaderText("Enter the email of the user you wish to invite:");
+
+  	    Optional<String> emailOut = emailTalk.showAndWait();
+  	    if (emailOut.isPresent()) {
+  	        String email = emailOut.get(); 
+
+  	        Optional<String> out = type.showAndWait();
+  	        if (out.isPresent()) {
+  	            String role = out.get();
+
+  	            // Now register the user with the provided email, generated password, and selected role
+  	            try {
+  	                databaseHelper.connectToDatabase();
+  	                databaseHelper.register(email, password, role);
+  	                databaseHelper.closeConnection();
+  	                Label successLabel = new Label("User succesfully invited");
+  	                successLabel.setTextFill(Color.GREEN);
+  	            } catch (SQLException e) {
+  	                e.printStackTrace();
+  	            }
+  	        } else {
+  	        	Label successLabel = new Label("Role selection was canceled");
+                successLabel.setTextFill(Color.RED);
+  	        }
+  	    } else {
+  	    	Label successLabel = new Label("Email input was canceled");
+	        successLabel.setTextFill(Color.RED);
+  	    }
+  	}
+  	
+  	
+  	private void changeUserRole() {
+  	    List<String> roles = new ArrayList<>();
+  	    roles.add("Student");
+  	    roles.add("Instructor");
+
+  	    ChoiceDialog<String> type = new ChoiceDialog<>("Student", roles);
+  	    type.setContentText("Select a role:");
+
+  	    TextInputDialog emailTalk = new TextInputDialog();
+  	    emailTalk.setHeaderText("Enter the email of the user you wish to invite:");
+
+  	    Optional<String> emailOut = emailTalk.showAndWait();
+  	    if (emailOut.isPresent()) {
+  	        String email = emailOut.get(); 
+
+  	        Optional<String> out = type.showAndWait();
+  	        if (out.isPresent()) {
+  	            String role = out.get();
+
+  	            // Change the role of the user
+  	            try {
+  	                databaseHelper.connectToDatabase();
+  	                updateUserRole(role, email);
+  	                databaseHelper.closeConnection();
+  	                Label successLabel = new Label("User succesfully changed roles");
+  	                successLabel.setTextFill(Color.GREEN);
+  	            } catch (SQLException e) {
+  	                e.printStackTrace();
+  	            }
+  	        } else {
+  	        	Label successLabel = new Label("Role selection was canceled");
+                successLabel.setTextFill(Color.RED);
+  	        }
+  	    } else {
+  	    	Label successLabel = new Label("Email input was canceled");
+	        successLabel.setTextFill(Color.RED);
+  	    }
+  	}
+  	
+  	private void updateUserRole(String role, String email) {
+  		String sql = "UPDATE cse360users SET role = ? WHERE email = ?";
+        //Label alertLabel = new Label("");
+
+        try {
+            databaseHelper.connectToDatabase();
+            try (PreparedStatement pstmt = databaseHelper.getConnection().prepareStatement(sql)) {
+                pstmt.setString(1, role);
+                pstmt.setString(2, email);
+                int affectedRows = pstmt.executeUpdate();
+                
+                if (affectedRows > 0) {
+                	Label alertLabel = new Label("Role succesfully changed to " + role);
+  	                alertLabel.setTextFill(Color.GREEN);
+                } else {
+                	Label alertLabel = new Label("Role succesfully changed to " + role);
+                	alertLabel.setText("No user found with that username + " + email);
+                	alertLabel.setTextFill(Color.RED);
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        	Label alertLabel = new Label("Role succesfully changed to " + role);
+            alertLabel.setText("Error Changing Role");
+            alertLabel.setTextFill(Color.RED);
+        } finally {
+            databaseHelper.closeConnection();
+        }
+  	}
 }

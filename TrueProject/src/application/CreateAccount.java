@@ -89,7 +89,7 @@ public class CreateAccount {
         
         Label alert = new Label();
         Label alertUser = new Label();
-        String OTP = AdminHomePage.OTP();
+        String OTP = PassReset.generateOTP();
        
         backButton.setOnAction(e -> {
         	alertUser.setText("");

@@ -104,9 +104,9 @@ class DatabaseHelper {
 
 			// Display values 
 			System.out.print("ID: " + id); 
-			System.out.print(", Age: " + email); 
-			System.out.print(", First: " + password); 
-			System.out.println(", Last: " + role); 
+			System.out.print(", Username: " + email); 
+			System.out.print(", Password: " + password); 
+			System.out.println(", Role: " + role); 
 		} 
 	}
 	
@@ -177,5 +177,9 @@ class DatabaseHelper {
 		} catch(SQLException se){
 			se.printStackTrace();
 		} 
+	}
+	
+	public Connection getConnection() {
+		return this.connection;
 	}
 }
