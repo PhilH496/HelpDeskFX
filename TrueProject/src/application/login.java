@@ -16,6 +16,8 @@ import java.sql.SQLException;
 public class login {
     
     public Scene getScene(Stage primaryStage) {
+    	
+    	
 
         Label title = new Label("ASU Help System");
         title.setFont(new Font("Roboto", 25));

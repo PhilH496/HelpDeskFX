@@ -21,23 +21,45 @@ public class CreateAccount {
 	
 	public void accountSetter(String email, String gettingPass, String role) {
 		   
+		
            DatabaseHelper db = new DatabaseHelper();
            try {
-               // Connect to the database
                db.connectToDatabase();
                
               db.register(email, gettingPass, role);
               System.out.println("Registering " + email + "....");
            } catch (SQLException ex) {
-               ex.printStackTrace(); // Handle any SQL errors here
+               ex.printStackTrace(); 
            } finally {
-               // Ensure the database connection is closed
+  
                db.closeConnection();
            }
 	}
+	
+	public boolean isAdmin() {
+		   
+		
+        DatabaseHelper db = new DatabaseHelper();
+        try {
+            db.connectToDatabase();
+            if (db.isDatabaseEmpty())
+            {
+            	return true;
+            }
+           
+        } catch (SQLException ex) {
+            ex.printStackTrace(); 
+        } finally {
+
+            db.closeConnection();
+        }
+        
+        return false;
+	}
     
     public Scene getScene(Stage primaryStage) {
-
+    	boolean adminOrNot = isAdmin();
+    	
        Label createAccount = new Label("Create Your Account");
        createAccount.setStyle("-fx-font-weight: bold; -fx-font-size: 25px; -fx-font-family: 'Roboto';");
 
@@ -66,10 +88,12 @@ public class CreateAccount {
         RadioButton studentButton = new RadioButton("Student");
         RadioButton instructorButton = new RadioButton("Instructor");
         RadioButton all = new RadioButton("All");
+        RadioButton adminOption = new RadioButton("admin");
         ToggleGroup roleGroup = new ToggleGroup();
         studentButton.setToggleGroup(roleGroup);
         instructorButton.setToggleGroup(roleGroup);
         all.setToggleGroup(roleGroup);
+        adminOption.setToggleGroup(roleGroup);
         roleGroup.selectToggle(studentButton);
         
 
@@ -142,8 +166,14 @@ public class CreateAccount {
         VBox cb = new VBox(20);
         cb.setAlignment(Pos.CENTER);
         cb.getChildren().addAll(createAccount, userNameArea, usernameField, alertUser, passText, passWordArea, passField,
-        		passFieldTwo, alert, Role, studentButton, instructorButton, all, inviteLabel, invitationArea, backButton);
-
+        		passFieldTwo, alert, Role, studentButton, instructorButton, all);
+        if (adminOrNot == true)
+        {
+        	cb.getChildren().addAll(adminOption);
+        }
+        
+        cb.getChildren().addAll(inviteLabel, invitationArea, backButton);
+        
         return new Scene(cb, 800, 800);
     }
 }
