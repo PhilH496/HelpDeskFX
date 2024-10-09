@@ -39,31 +39,28 @@ public class Main extends Application {
 		}
 		
 	}
-	
+	//For debugging purposes
 	public void testDatabaseHelper() {
         DatabaseHelper dbHelper = new DatabaseHelper();
 
         try {
-            // Connect to the database
             dbHelper.connectToDatabase();
 
-            // Check if the database is empty
+       
             if (dbHelper.isDatabaseEmpty()) {
                 System.out.println("Database is empty. Registering new users...");
             } else {
                 System.out.println("Database already contains users. Registering additional user...");
 
-                // Register the second user even if the database is not empty
+                
             }
 
-            // Display all users as admin
             System.out.println("Displaying all users (admin view):");
             dbHelper.displayUsersByAdmin();
 
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
-            // Close the database connection
             dbHelper.closeConnection();
         }
     }
