@@ -14,6 +14,8 @@ public class UserNameRecognizer {
 	 * @author Lynn Robert Carter
 	 * 
 	 * @version 1.00		2024-09-13	Initial baseline derived from the Even Recognizer
+	 * 
+	 * Other details: Using this code to help implement into project. Minor tweaks and edits may be made.
 	 */
 
 	/**********************************************************************************************

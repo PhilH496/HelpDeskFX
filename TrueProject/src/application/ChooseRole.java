@@ -17,6 +17,8 @@ import java.sql.SQLException;
 public class ChooseRole {
 	 public Scene getScene(Stage primaryStage, String roleKind) {
 		 
+		 	//Page to choose your role of whether you're an admin, instructor, or student depending
+		 	//on if you chose the admin role or "ALL" role
 		 	Label roleCall = new Label("Choose your role:");
 		 	roleCall.setStyle("-fx-font-weight: bold; -fx-font-size: 30px; -fx-font-family: 'Roboto';");
 		 	
@@ -36,6 +38,7 @@ public class ChooseRole {
 	    	listUsers.setMaxWidth(500);   
 	    	listUsers.setMinHeight(50);
 	    	
+	    	//Functional buttons when clicked to redirect to specific home pages.
 	        admin.setOnAction(e -> {
 	            AdminHomePage adminPage = new AdminHomePage();
 	            primaryStage.setScene(adminPage.getScene(primaryStage));
@@ -51,6 +54,7 @@ public class ChooseRole {
 	            primaryStage.setScene(userHome.getScene(primaryStage));
 	        });
 		    
+	        //Setting up layout and whether user is either admin or the ALL role to correctly display choices
 	        VBox cb = new VBox(20);
 	        cb.setAlignment(Pos.TOP_CENTER);
 	        cb.getChildren().addAll(roleCall);

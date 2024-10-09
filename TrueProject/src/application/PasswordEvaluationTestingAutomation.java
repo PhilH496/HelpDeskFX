@@ -3,9 +3,7 @@ package application;
 /*******
  * <p> PasswordEvaluationTestingAutomation Class. </p>
  * 
- * 
- * 
- * @author Nathan
+ * @author Nathan and Carter; Code from HW and from Carter! 
  * 
  * @version 
  * 

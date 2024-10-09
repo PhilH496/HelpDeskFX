@@ -1,5 +1,5 @@
 package application;
-
+//Code from HW and from Carter! just minor tweaking
 
 public class PasswordEvaluator {
 
@@ -41,7 +41,7 @@ public class PasswordEvaluator {
 		foundNumericDigit = false;
 		foundLongEnough = false;
 		running = true;
-
+		// error msgs if found untrue
 		while (running) {
 			displayInputState();
 			if (currentChar >= 'A' && currentChar <= 'Z') {

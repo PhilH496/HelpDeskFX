@@ -9,6 +9,12 @@ import javafx.scene.layout.*;
 public class Profile {
 	
     public Scene getScene(Stage primaryStage, String roleKind) {
+    	
+    	/*
+    	 * layout set up to begin where pieces should go. 
+    	 * Personal information included as well such as first, last, middle, email, and preferred name.
+    	 * Buttons are also created to goto the next page
+    	 */
         VBox cb = new VBox(40);
         cb.setPadding(new Insets(40));
         cb.setAlignment(Pos.TOP_LEFT);
@@ -40,10 +46,10 @@ public class Profile {
         preferArea.setMinHeight(20); 
         preferArea.setMaxWidth(300);        
         
+     // On-action commands that set users to go to a specific page 
         
         Button studentPage = new Button("Finish Setting Up Profile (Student)");
         studentPage.setMaxWidth(300);
-
         
         studentPage.setOnAction(e -> {
             UserHomePage userHome = new UserHomePage();
@@ -70,6 +76,9 @@ public class Profile {
         ScrollPane scrolling = new ScrollPane(cb);
         scrolling.setFitToWidth(true); // Ensure scroll pane resizes with the window  
         
+        /*Adds personal information first to setup the layout correctly. Depending on one's choice, they can
+        log in as either admin, student or teacher. Specific role buttons display corresponding to what the
+        user set up as their choice in the create account page. */
         cb.getChildren().addAll(profileFinish, FirstName, firstArea, MiddleName, middleArea, LastName, lastArea,
        		 emailAddress, emailArea, preferredName, preferArea);		
         		System.out.println(roleKind);

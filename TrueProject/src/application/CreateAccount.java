@@ -1,8 +1,6 @@
 package application;
 
 import java.sql.SQLException;
-
-import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
@@ -13,14 +11,13 @@ import javafx.scene.control.TextField;
 import javafx.scene.control.ToggleGroup;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
-import javafx.scene.text.Font;
 import javafx.stage.Stage;
 import javafx.scene.control.TextArea;
 
 public class CreateAccount {
 	
+	// code to help setup and register a person's role of student/instructor
 	public void accountSetter(String email, String gettingPass, String role) {
-		   
 		
            DatabaseHelper db = new DatabaseHelper();
            try {
@@ -36,9 +33,8 @@ public class CreateAccount {
            }
 	}
 	
-	public boolean isAdmin() {
-		   
-		
+	// Checks if the database is empty. If it is, we let the user when creating account to become admin
+	public boolean isAdmin() {	
         DatabaseHelper db = new DatabaseHelper();
         try {
             db.connectToDatabase();
@@ -73,7 +69,7 @@ public class CreateAccount {
         passText.setText("At least one uppercase and lowercase letter, one digit,"
         		+ "\nspecial character, and a minimum of 8 characters long");
         
-        // Password area for the 360 user to fill out
+        // Password area along with a confirmation area
         Label passWordArea = new Label("Password");
         PasswordField passField = new PasswordField();
         passField.setPromptText("Choose a password");
@@ -83,6 +79,8 @@ public class CreateAccount {
         passFieldTwo.setPromptText("Confirm Password");
         passFieldTwo.setMaxWidth(300);
         
+        
+        //List of roles you can choose from
         Label Role = new Label("Role");
         Role.setStyle("-fx-font-weight: bold; -fx-font-size: 20px; -fx-font-family: 'Roboto';");
         RadioButton studentButton = new RadioButton("Student");
@@ -109,12 +107,12 @@ public class CreateAccount {
         Button backButton = new Button("Finish Set Up");
         backButton.setMaxWidth(300);
         
-        
-        
         Label alert = new Label();
         Label alertUser = new Label();
         String OTP = PassReset.generateOTP();
        
+        //back button with functionality as to what to return with
+        //additionally checks if username and password are of correct status
         backButton.setOnAction(e -> {
         	alertUser.setText("");
         	alert.setText("");
@@ -163,6 +161,7 @@ public class CreateAccount {
         	}
         });
       
+        //Layout for one part aside from admin and including admin
         VBox cb = new VBox(20);
         cb.setAlignment(Pos.CENTER);
         cb.getChildren().addAll(createAccount, userNameArea, usernameField, alertUser, passText, passWordArea, passField,

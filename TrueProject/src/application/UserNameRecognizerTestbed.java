@@ -14,6 +14,9 @@ import java.util.Scanner;
  * @version 1.00	2024-09-13 The mainline of a console terminal implementation of an UserName
  * 					Recognizer testbed
  * 
+ * Other details: Using this code to help implement into project. Helps to make testing the username easier Minor tweaks and edits may be made.
+ * 
+ * 
  */
 
 public class UserNameRecognizerTestbed{
@@ -45,7 +48,7 @@ public class UserNameRecognizerTestbed{
  			
  			// If the returned String is not empty, it is an error message
 			if (errMessage != "") {
-				// Display the error message
+				// Display the error message here
 				System.out.println(errMessage);
 				
 				// Fetch the index where the processing of the input stopped
