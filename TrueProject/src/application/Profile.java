@@ -110,7 +110,7 @@ public class Profile {
         cb.getChildren().addAll(profileFinish, FirstName, firstArea, MiddleName, middleArea, LastName, lastArea,
        		 emailAddress, emailArea, preferredName, preferArea);		
         		System.out.println(roleKind);
-   	 			if ("admin".equals(roleKind)) {
+   	 			if ("Admin".equals(roleKind)) {
    	 				cb.getChildren().addAll(adminPage, studentPage, teacherPage); 
    	 			} 
    	 			else if ("All".equals(roleKind)) {

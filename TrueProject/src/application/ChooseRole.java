@@ -60,7 +60,7 @@ public class ChooseRole {
 	        VBox cb = new VBox(20);
 	        cb.setAlignment(Pos.TOP_CENTER);
 	        cb.getChildren().addAll(roleCall);
-	       if (roleKind.equals("admin"))
+	       if (roleKind.equals("Admin"))
 	       {
 	    	   cb.getChildren().addAll(admin);
 	       }

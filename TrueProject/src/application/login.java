@@ -52,7 +52,7 @@ public class login {
            String username = usernameField.getText();
            String passw = passwordField.getText();
            DatabaseHelper dbHelper = new DatabaseHelper();
-           String roleOne = "admin";
+           String roleOne = "Admin";
            String roleTwo = "Student";
            String roleThree = "Instructor";
            String roleFour = "All";
