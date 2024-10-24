@@ -11,7 +11,6 @@ import javafx.scene.text.Font;
 import javafx.stage.Stage;
 import java.sql.SQLException;
 
-
 public class login {
     
     public Scene getScene(Stage primaryStage) {
@@ -25,8 +24,6 @@ public class login {
         TextField usernameField = new TextField();
         usernameField.setPromptText("Enter your username");
         usernameField.setMaxWidth(300);
-
-
 
         // Set password field for code
         Label password = new Label("Password");
@@ -52,7 +49,7 @@ public class login {
         
         //Clicking Sign in will prompt us with a mini questionnaire about ourselves. Additional login info as well
         signingInButt.setOnAction(e -> {
-           String email = usernameField.getText();
+           String username = usernameField.getText();
            String passw = passwordField.getText();
            DatabaseHelper dbHelper = new DatabaseHelper();
            String roleOne = "admin";
@@ -63,68 +60,63 @@ public class login {
                dbHelper.connectToDatabase();
                
                // Perform login check and goto either profile page or straight to home page or choose specific role
-               
-               //if as admin
-               if (dbHelper.login(email, passw, roleOne)) {
-            	   if (dbHelper.isProfileCompleted(email))
+               Profile profileSc = new Profile();
+               // If as admin
+               if (dbHelper.login(username, passw, roleOne)) {
+            	   if (dbHelper.isProfileCompleted(username))
             	   {
             		   ChooseRole pageType = new ChooseRole();
-            		   primaryStage.setScene(pageType.getScene(primaryStage, roleOne));
+            		   primaryStage.setScene(pageType.getScene(primaryStage, roleOne, username));
             	   }
             	   else
             	   {
-                   Profile profileSc = new Profile();
-                   dbHelper.markProfileCompleted(email);
-                   primaryStage.setScene(profileSc.getScene(primaryStage, roleOne));
+                   dbHelper.markProfileCompleted(username);
+                   primaryStage.setScene(profileSc.getScene(primaryStage, roleOne, username));
                    
             	   }
-               } // if as a student
-               else if (dbHelper.login(email, passw, roleTwo))
+               } // If as a student
+               else if (dbHelper.login(username, passw, roleTwo))
                {
-            	   if (dbHelper.isProfileCompleted(email))
+            	   if (dbHelper.isProfileCompleted(username))
             	   {
             		   UserHomePage userHome = new UserHomePage();
-            		   primaryStage.setScene(userHome.getScene(primaryStage));
+            		   primaryStage.setScene(userHome.getScene(primaryStage, username));
             	   }
             	   else
             	   {
-                   Profile profileSc = new Profile();
-                   dbHelper.markProfileCompleted(email);
-                   primaryStage.setScene(profileSc.getScene(primaryStage, roleTwo));
+                   dbHelper.markProfileCompleted(username);
+                   primaryStage.setScene(profileSc.getScene(primaryStage, roleTwo, username));
                    
             	   }        	   
                } // if as an instructor
-               else if (dbHelper.login(email, passw, roleThree))
+               else if (dbHelper.login(username, passw, roleThree))
                {
-            	   if (dbHelper.isProfileCompleted(email))
+            	   if (dbHelper.isProfileCompleted(username))
             	   {
             		   InstructorPage instructorHome = new InstructorPage();
-            		   primaryStage.setScene(instructorHome.getScene(primaryStage));
+            		   primaryStage.setScene(instructorHome.getScene(primaryStage, username));
             	   }
             	   else
             	   {
-                   Profile profileSc = new Profile();
-                   dbHelper.markProfileCompleted(email);
-                   primaryStage.setScene(profileSc.getScene(primaryStage, roleThree));
+                   dbHelper.markProfileCompleted(username);
+                   primaryStage.setScene(profileSc.getScene(primaryStage, roleThree, username));
                    
             	   } 
                } // if both student + instructor
-               else if (dbHelper.login(email, passw, roleFour))
+               else if (dbHelper.login(username, passw, roleFour))
                {
-            	   if (dbHelper.isProfileCompleted(email))
+            	   if (dbHelper.isProfileCompleted(username))
             	   {
             		   ChooseRole pageType = new ChooseRole();
-            		   primaryStage.setScene(pageType.getScene(primaryStage, roleFour));
+            		   primaryStage.setScene(pageType.getScene(primaryStage, roleFour, username));
             	   }
             	   else
             	   {
-            		   Profile profileSc = new Profile();
-            		   dbHelper.markProfileCompleted(email);
-                   	   primaryStage.setScene(profileSc.getScene(primaryStage, roleFour));
+            		   dbHelper.markProfileCompleted(username);
+                   	   primaryStage.setScene(profileSc.getScene(primaryStage, roleFour, username));
                    
             	   }
                }
-            	   
                else {
                    userOrPass.setStyle("-fx-text-fill: red;");
                    userOrPass.setText("ERROR: Username or Password is incorrect");
@@ -136,7 +128,6 @@ public class login {
                dbHelper.closeConnection();
            }
         });
-
 
         // Layout for how it will look
         VBox layout = new VBox(20);

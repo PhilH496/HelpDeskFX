@@ -32,14 +32,15 @@ class DatabaseHelper {
 	private void createTables() throws SQLException {
 		String userTable = "CREATE TABLE IF NOT EXISTS cse360users ("
 				+ "id INT AUTO_INCREMENT PRIMARY KEY, "
-				+ "email VARCHAR(255) UNIQUE, "
+				+ "username VARCHAR(255) UNIQUE, "
 				+ "password VARCHAR(255), "
-				+ "role VARCHAR(20))";
+				+ "role VARCHAR(20),"
+				+ "email VARCHAR(255),"
+				+ "name VARCHAR(255),"
+				+ "preferred_name VARCHAR(255),"
+				+ "profile_completed BOOLEAN DEFAULT FALSE)";
 		statement.execute(userTable);
-	    String addProfileColumn = "ALTER TABLE cse360users ADD COLUMN IF NOT EXISTS profile_completed BOOLEAN DEFAULT FALSE";
-	    statement.execute(addProfileColumn);
 	}
-
 
 	// Check if the database is empty
 	public boolean isDatabaseEmpty() throws SQLException {
@@ -51,20 +52,20 @@ class DatabaseHelper {
 		return true;
 	}
 
-	public void register(String email, String password, String role) throws SQLException {
-		String insertUser = "INSERT INTO cse360users (email, password, role) VALUES (?, ?, ?)";
+	public void register(String username, String password, String role) throws SQLException {
+		String insertUser = "INSERT INTO cse360users (username, password, role) VALUES (?, ?, ?)";
 		try (PreparedStatement pstmt = connection.prepareStatement(insertUser)) {
-			pstmt.setString(1, email);
+			pstmt.setString(1, username);
 			pstmt.setString(2, password);
 			pstmt.setString(3, role);
 			pstmt.executeUpdate();
 		}
 	}
 
-	public boolean login(String email, String password, String role) throws SQLException {
-		String query = "SELECT * FROM cse360users WHERE email = ? AND password = ? AND role = ?";
+	public boolean login(String username, String password, String role) throws SQLException {
+		String query = "SELECT * FROM cse360users WHERE username = ? AND password = ? AND role = ?";
 		try (PreparedStatement pstmt = connection.prepareStatement(query)) {
-			pstmt.setString(1, email);
+			pstmt.setString(1, username);
 			pstmt.setString(2, password);
 			pstmt.setString(3, role);
 			try (ResultSet rs = pstmt.executeQuery()) {
@@ -73,11 +74,10 @@ class DatabaseHelper {
 		}
 	}
 	
-	public boolean doesUserExist(String email) {
-	    String query = "SELECT COUNT(*) FROM cse360users WHERE email = ?";
+	public boolean doesUserExist(String username) {
+	    String query = "SELECT COUNT(*) FROM cse360users WHERE username = ?";
 	    try (PreparedStatement pstmt = connection.prepareStatement(query)) {
-	        
-	        pstmt.setString(1, email);
+	        pstmt.setString(1, username);
 	        ResultSet rs = pstmt.executeQuery();
 	        
 	        if (rs.next()) {
@@ -97,16 +97,22 @@ class DatabaseHelper {
 
 		while(rs.next()) { 
 			// Retrieve by column name 
-			int id  = rs.getInt("id"); 
-			String  email = rs.getString("email"); 
+			int id = rs.getInt("id"); 
+			String username = rs.getString("username"); 
 			String password = rs.getString("password"); 
 			String role = rs.getString("role");  
+			String prefName = rs.getString("preferred_name");
+			String name = rs.getString("name");
+			String email = rs.getString("email");
 
 			// Display values 
 			System.out.print("ID: " + id); 
-			System.out.print(", Username: " + email); 
+			System.out.print(", Username: " + username); 
 			System.out.print(", Password: " + password); 
 			System.out.println(", Role: " + role); 
+			System.out.print(", Preferred name: " + prefName); 
+			System.out.print(", Name: " + name); 
+			System.out.println(", Email: " + email); 
 		} 
 	}
 	
@@ -119,38 +125,38 @@ class DatabaseHelper {
 
 		while(rs.next()) { 
 			// Retrieve by column name 
-			int id  = rs.getInt("id"); 
-			String  email = rs.getString("email"); 
+			int id = rs.getInt("id"); 
+			String username = rs.getString("username"); 
 			String password = rs.getString("password"); 
 			String role = rs.getString("role");  
 
 			// Display values 
-			users.add(new User(id, email, password, role));
+			users.add(new User(id, username, password, role));
 		} 
 		return users;
 	}
 	
 	// Method to delete user from the database
-	public void deleteUser(String email) throws SQLException {
-	    String deleteUserQuery = "DELETE FROM cse360users WHERE email = ?";
+	public void deleteUser(String username) throws SQLException {
+	    String deleteUserQuery = "DELETE FROM cse360users WHERE username = ?";
 	    try (PreparedStatement pstmt = connection.prepareStatement(deleteUserQuery)) {
-	        pstmt.setString(1, email);
+	        pstmt.setString(1, username);
 	        int rowsAffected = pstmt.executeUpdate();
 	        
 	        if (rowsAffected > 0) {
-	            System.out.println("User with email " + email + " deleted successfully.");
+	            System.out.println("User with username " + username + " deleted successfully.");
 	        } else {
-	            System.out.println("No user found with email " + email + ".");
+	            System.out.println("No user found with username " + username + ".");
 	        }
 	    } catch (SQLException e) {
 	        e.printStackTrace();
 	    }
 	}
 
-	public boolean isProfileCompleted(String email) throws SQLException {
-	    String query = "SELECT profile_completed FROM cse360users WHERE email = ?";
+	public boolean isProfileCompleted(String username) throws SQLException {
+	    String query = "SELECT profile_completed FROM cse360users WHERE username = ?";
 	    try (PreparedStatement pstmt = connection.prepareStatement(query)) {
-	        pstmt.setString(1, email);
+	        pstmt.setString(1, username);
 	        ResultSet rs = pstmt.executeQuery();
 	        if (rs.next()) {
 	            return rs.getBoolean("profile_completed");
@@ -159,14 +165,13 @@ class DatabaseHelper {
 	    return false; 
 	}
 	
-	public void markProfileCompleted(String email) throws SQLException {
-	    String query = "UPDATE cse360users SET profile_completed = TRUE WHERE email = ?";
+	public void markProfileCompleted(String username) throws SQLException {
+	    String query = "UPDATE cse360users SET profile_completed = TRUE WHERE username = ?";
 	    try (PreparedStatement pstmt = connection.prepareStatement(query)) {
-	        pstmt.setString(1, email);
+	        pstmt.setString(1, username);
 	        pstmt.executeUpdate();
 	    }
 	}
-	
 	
 	public void closeConnection() {
 		try{
@@ -179,6 +184,41 @@ class DatabaseHelper {
 		} catch(SQLException se){
 			se.printStackTrace();
 		} 
+	}
+	// Updates user data in the database with their email, name and preferredName 
+	public void updateProfile(String username, String email, String name, String preferredName) throws SQLException {
+	    String updateProfileQuery = "UPDATE cse360users SET email = ?, name = ?, preferred_name = ?, profile_completed = TRUE WHERE username = ?";
+	    try (PreparedStatement pstmt = connection.prepareStatement(updateProfileQuery)) {
+	        pstmt.setString(1, email);
+	        pstmt.setString(2, name);
+	        pstmt.setString(3, preferredName);
+	        pstmt.setString(4, username);
+	        int rowsUpdated = pstmt.executeUpdate();
+	        
+	        if (rowsUpdated > 0) {
+	            System.out.println("Profile updated created for " + username);
+	        } else {
+	            System.out.println("No user found with username " + username);
+	        }
+	    }
+	}
+	// Returns preferred name from database given the user's username
+	public String getPrefName(String username) throws SQLException {
+	    String sql = "SELECT preferred_name FROM cse360users WHERE username = ?";
+	    String prefname = null;
+
+	    try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
+	        pstmt.setString(1, username);
+	        ResultSet rs = pstmt.executeQuery();
+	        
+	        if (rs.next()) { 
+	            prefname = rs.getString("preferred_name");
+	        }
+	    }
+	    if (prefname == null) {
+	        return "User"; // Default message or return username as fallback
+	    }
+	    return prefname;
 	}
 	
 	// Method to return connection

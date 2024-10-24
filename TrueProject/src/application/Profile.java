@@ -1,4 +1,6 @@
 package application;
+
+import java.sql.SQLException;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -8,8 +10,7 @@ import javafx.scene.layout.*;
 
 public class Profile {
 	
-    public Scene getScene(Stage primaryStage, String roleKind) {
-    	
+    public Scene getScene(Stage primaryStage, String roleKind, String username) {
     	/*
     	 * layout set up to begin where pieces should go. 
     	 * Personal information included as well such as first, last, middle, email, and preferred name.
@@ -46,14 +47,28 @@ public class Profile {
         preferArea.setMinHeight(20); 
         preferArea.setMaxWidth(300);        
         
-     // On-action commands that set users to go to a specific page 
+        // On-action commands that set users to go to a specific page 
         
         Button studentPage = new Button("Finish Setting Up Profile (Student)");
         studentPage.setMaxWidth(300);
         
+        // User profile set up
         studentPage.setOnAction(e -> {
             UserHomePage userHome = new UserHomePage();
-            primaryStage.setScene(userHome.getScene(primaryStage));
+            String name = firstArea.getText() + " " + middleArea.getText() + " " + lastArea.getText();
+            String email = emailArea.getText();
+            String preferName = preferArea.getText();
+            DatabaseHelper db = new DatabaseHelper();
+            try {
+                db.connectToDatabase();
+                db.updateProfile(username, email, name, preferName);
+                System.out.println("Profile created for " + username);
+				primaryStage.setScene(userHome.getScene(primaryStage, username));
+            } catch (SQLException ex) {
+                ex.printStackTrace();
+            } finally {
+                db.closeConnection();
+            }
         });
         
         Button adminPage = new Button("Finish Setting Up Profile (Admin)");
@@ -67,10 +82,23 @@ public class Profile {
         Button teacherPage = new Button("Finish Setting Up Profile (Instructor)");
         teacherPage.setMaxWidth(300);
 
-        
+        // Instructor profile set up
         teacherPage.setOnAction(e -> {
             InstructorPage instru = new InstructorPage();
-            primaryStage.setScene(instru.getScene(primaryStage));
+            String name = firstArea.getText() + " " + middleArea.getText() + " " + lastArea.getText();
+            String email = emailArea.getText();
+            String preferName = preferArea.getText();
+            DatabaseHelper db = new DatabaseHelper();
+            try {
+                db.connectToDatabase();
+                db.updateProfile(username, email, name, preferName);
+                System.out.println("Profile created for " + username);
+				primaryStage.setScene(instru.getScene(primaryStage, username));
+            } catch (SQLException ex) {
+                ex.printStackTrace();
+            } finally {
+                db.closeConnection();
+            }
         });
 
         ScrollPane scrolling = new ScrollPane(cb);
@@ -96,9 +124,6 @@ public class Profile {
    	 			{
    	 				cb.getChildren().addAll(teacherPage);
    	 			}    
-
-
          return new Scene(scrolling, 800, 800);
     }
-    
 }

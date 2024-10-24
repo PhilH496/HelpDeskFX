@@ -1,5 +1,7 @@
 package application;
 
+import java.sql.SQLException;
+
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
@@ -8,8 +10,7 @@ import javafx.stage.Stage;
 import javafx.scene.control.Label;
 
 public class ChooseRole {
-	 public Scene getScene(Stage primaryStage, String roleKind) {
-		 
+	 public Scene getScene(Stage primaryStage, String roleKind, String username) {
 		 	//Page to choose your role of whether you're an admin, instructor, or student depending
 		 	//on if you chose the admin role or "ALL" role
 		 	Label roleCall = new Label("Choose your role:");
@@ -39,12 +40,20 @@ public class ChooseRole {
 		 
 	        instructor.setOnAction(e -> {
 	            InstructorPage instructorHome = new InstructorPage();
-	            primaryStage.setScene(instructorHome.getScene(primaryStage));
+	            try {
+					primaryStage.setScene(instructorHome.getScene(primaryStage, username));
+				} catch (SQLException e1) {
+					e1.printStackTrace();
+				}
 	        });
 	    	
 	        student.setOnAction(e -> {
 	            UserHomePage userHome = new UserHomePage();
-	            primaryStage.setScene(userHome.getScene(primaryStage));
+	            try {
+					primaryStage.setScene(userHome.getScene(primaryStage, username));
+				} catch (SQLException e1) {
+					e1.printStackTrace();
+				}
 	        });
 		    
 	        //Setting up layout and whether user is either admin or the ALL role to correctly display choices
@@ -57,7 +66,6 @@ public class ChooseRole {
 	       }
 
 	        cb.getChildren().addAll(instructor, student);
-
 	        return new Scene(cb, 600, 600);
 	 }
 	

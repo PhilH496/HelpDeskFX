@@ -15,16 +15,14 @@ import javafx.stage.Stage;
 import javafx.scene.control.TextArea;
 
 public class CreateAccount {
-	
-	// code to help setup and register a person's role of student/instructor
-	public void accountSetter(String email, String gettingPass, String role) {
-		
+	// Code to help setup and register a person's role of student/instructor
+	public void accountSetter(String username, String gettingPass, String role) {
            DatabaseHelper db = new DatabaseHelper();
            try {
-               db.connectToDatabase();
+              db.connectToDatabase();
                
-              db.register(email, gettingPass, role);
-              System.out.println("Registering " + email + "....");
+              db.register(username, gettingPass, role);
+              System.out.println("Registering " + username + "....");
            } catch (SQLException ex) {
                ex.printStackTrace(); 
            } finally {
@@ -56,10 +54,10 @@ public class CreateAccount {
     public Scene getScene(Stage primaryStage) {
     	boolean adminOrNot = isAdmin();
     	
-       Label createAccount = new Label("Create Your Account");
-       createAccount.setStyle("-fx-font-weight: bold; -fx-font-size: 25px; -fx-font-family: 'Roboto';");
+        Label createAccount = new Label("Create Your Account");
+        createAccount.setStyle("-fx-font-weight: bold; -fx-font-size: 25px; -fx-font-family: 'Roboto';");
 
-        //This area includes the user class for people to goto
+        // This area includes the user class for people to goto
         Label userNameArea = new Label("Username");
         TextField usernameField = new TextField();
         usernameField.setPromptText("Choose a username");
@@ -79,21 +77,19 @@ public class CreateAccount {
         passFieldTwo.setPromptText("Confirm Password");
         passFieldTwo.setMaxWidth(300);
         
-        
         //List of roles you can choose from
         Label Role = new Label("Role");
         Role.setStyle("-fx-font-weight: bold; -fx-font-size: 20px; -fx-font-family: 'Roboto';");
         RadioButton studentButton = new RadioButton("Student");
         RadioButton instructorButton = new RadioButton("Instructor");
         RadioButton all = new RadioButton("All");
-        RadioButton adminOption = new RadioButton("admin");
+        RadioButton adminOption = new RadioButton("Admin");
         ToggleGroup roleGroup = new ToggleGroup();
         studentButton.setToggleGroup(roleGroup);
         instructorButton.setToggleGroup(roleGroup);
         all.setToggleGroup(roleGroup);
         adminOption.setToggleGroup(roleGroup);
         roleGroup.selectToggle(studentButton);
-        
 
         // Invitation code in case someone gets a link from the admin
         Label inviteLabel = new Label("OR Invitation Code");
@@ -111,8 +107,8 @@ public class CreateAccount {
         Label alertUser = new Label();
         String OTP = PassReset.generateOTP();
        
-        //back button with functionality as to what to return with
-        //additionally checks if username and password are of correct status
+        // Back button with functionality as to what to return with
+        // additionally checks if username and password are of correct status
         backButton.setOnAction(e -> {
         	alertUser.setText("");
         	alert.setText("");
@@ -125,10 +121,7 @@ public class CreateAccount {
         	
         	RadioButton selectedRadioButton = (RadioButton) roleGroup.getSelectedToggle();
         	String roleType = selectedRadioButton.getText();
-        	
-        	
-        	//System.out.println(confirm);
-        	//System.out.println(confirmTwo);
+
         	if (inviteText.equals(OTP))
         	{
                 login loginScene = new login();
@@ -153,8 +146,7 @@ public class CreateAccount {
         		alert.setText(correctness);
         	}
         	else
-        	{
-        		 
+        	{ 
         		accountSetter(name, confirm, roleType);
         		login loginScene = new login();
         		primaryStage.setScene(loginScene.getScene(primaryStage));
@@ -172,7 +164,6 @@ public class CreateAccount {
         }
         
         cb.getChildren().addAll(inviteLabel, invitationArea, backButton);
-        
         return new Scene(cb, 800, 800);
     }
 }

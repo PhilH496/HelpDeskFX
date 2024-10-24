@@ -103,7 +103,7 @@ public class AdminHomePage {
     	
     	Optional<String> confirm = text.showAndWait();
 
-        confirm.ifPresent(email -> {
+        confirm.ifPresent(username -> {
         	// Create a confirmation alert dialog
         	Alert confirming = new Alert(AlertType.CONFIRMATION);
         	confirming.setHeaderText("Are you sure you want to delete this user?");
@@ -115,7 +115,7 @@ public class AdminHomePage {
         	if (confirmation.isPresent() && confirmation.get() == ButtonType.OK) {
         		try {
         			databaseHelper.connectToDatabase();  
-        			databaseHelper.deleteUser(email);   
+        			databaseHelper.deleteUser(username);   
         			databaseHelper.closeConnection();    
         			
         			Alert successAlert = new Alert(Alert.AlertType.INFORMATION);
@@ -146,10 +146,10 @@ public class AdminHomePage {
 	        TableColumn<User, Integer> idColumn = new TableColumn<>("ID");
 	        idColumn.setCellValueFactory(new PropertyValueFactory<>("ID"));			 // Return the ID from the getID() method in User.java
 	        
-	        TableColumn<User, String> emailColumn = new TableColumn<>("Username");
-	        emailColumn.setCellValueFactory(new PropertyValueFactory<>("username")); // Return the username from the getUsername() method 
+	        TableColumn<User, String> usernameColumn = new TableColumn<>("Username");
+	        usernameColumn.setCellValueFactory(new PropertyValueFactory<>("username")); // Return the username from the getUsername() method 
 	        
-	        table.getColumns().addAll(idColumn, emailColumn);
+	        table.getColumns().addAll(idColumn, usernameColumn);
 	        table.getItems().addAll(users);
 	        
 	        Button backButton = new Button("Return");
@@ -182,7 +182,7 @@ public class AdminHomePage {
   	    type.setContentText("Select a role:");
 
   	    TextInputDialog emailTalk = new TextInputDialog();
-  	    emailTalk.setHeaderText("Enter the username of the user you wish to invite:");
+  	    emailTalk.setHeaderText("Enter the email of the user you wish to invite:");
 
   	    Optional<String> emailOut = emailTalk.showAndWait();
   	    if (emailOut.isPresent()) {
@@ -222,7 +222,7 @@ public class AdminHomePage {
   	    type.setContentText("Select a role:");
 
   	    TextInputDialog emailTalk = new TextInputDialog();
-  	    emailTalk.setHeaderText("Enter the username of the user you wish to invite:");
+  	    emailTalk.setHeaderText("Enter the email of the user you wish to invite:");
 
   	    Optional<String> emailOut = emailTalk.showAndWait();
   	    if (emailOut.isPresent()) {							// If the email was entered
@@ -253,21 +253,21 @@ public class AdminHomePage {
   	}
   	
   	// Method to update user role in the database
-  	private void updateUserRole(String role, String email) {
+  	private void updateUserRole(String role, String username) {
   		String sql = "UPDATE cse360users SET role = ? WHERE email = ?";
 
         try {
             databaseHelper.connectToDatabase();
             try (PreparedStatement pstmt = databaseHelper.getConnection().prepareStatement(sql)) {
                 pstmt.setString(1, role);
-                pstmt.setString(2, email);
+                pstmt.setString(2, username);
                 int affectedRows = pstmt.executeUpdate();
                 
                 if (affectedRows > 0) { 		// Checks if theres information for that user
                 	Label successLabel = new Label("Role succesfully changed to " + role);
                 	successLabel.setTextFill(Color.GREEN);
                 } else {
-                	Label failureLabel = new Label("No user found with that username + " + email);
+                	Label failureLabel = new Label("No user found with that username + " + username);
                 	failureLabel.setTextFill(Color.RED);
                 }
             }

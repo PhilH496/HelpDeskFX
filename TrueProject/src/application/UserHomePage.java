@@ -1,5 +1,6 @@
 package application;
 
+import java.sql.SQLException;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -20,11 +21,14 @@ import javafx.stage.Stage;
  */
 public class UserHomePage {
 	// Method to create and return the UI for the user homepage
-    public Scene getScene(Stage primaryStage) {
+    public Scene getScene(Stage primaryStage, String username) throws SQLException {
         Label titleLabel = new Label("ASU Help System");
         titleLabel.setFont(Font.font("Roboto", FontWeight.BOLD, 20));
         
-        Label welcomeLabel = new Label("Welcome, Student");
+        
+        String prefName = "Student";
+		prefName = getPrefName(username);
+        Label welcomeLabel = new Label("Welcome, " + prefName);
         Button logout = new Button("Logout");
         
         Region spacer = new Region();
@@ -80,5 +84,13 @@ public class UserHomePage {
         box.setStyle("-fx-background-color: white; -fx-border-color: #e0e0e0; -fx-border-radius: 5;");
 
         return box;
+    }
+    
+    private String getPrefName(String username) throws SQLException {
+        DatabaseHelper db = new DatabaseHelper();
+        db.connectToDatabase();
+        String prefName = db.getPrefName(username);
+        db.closeConnection();
+        return prefName;
     }
 }
