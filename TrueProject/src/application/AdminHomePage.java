@@ -1,13 +1,19 @@
 package application;
 
+import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
+import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
+import javafx.scene.text.Font;
+import javafx.scene.text.FontWeight;
 import javafx.stage.Stage;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
@@ -36,8 +42,23 @@ public class AdminHomePage {
 	private static final DatabaseHelper databaseHelper = new DatabaseHelper();
 	// Method to create and return the UI for the admin homepage
     public Scene getScene(Stage primaryStage) {
-    	Label AdminPage = new Label("Admin Dashboard");
-    	AdminPage.setStyle("-fx-font-weight: bold; -fx-font-size: 30px; -fx-font-family: 'Roboto';");
+        Label titleLabel = new Label("Admin Home Page");
+        titleLabel.setFont(Font.font("Roboto", FontWeight.BOLD, 20));
+        String prefName = "Admin";
+        Label welcomeLabel = new Label("Welcome, " + prefName);
+        Button loggingOut = new Button("Logout");
+        
+        Region spacer = new Region();
+        HBox.setHgrow(spacer, Priority.ALWAYS);
+        
+        HBox header = new HBox(10);
+        header.setAlignment(Pos.CENTER_LEFT);
+        header.getChildren().addAll(titleLabel, spacer, welcomeLabel, loggingOut);
+        header.setPadding(new Insets(10, 20, 10, 20));
+        header.setStyle("-fx-background-color: #f0f0f0;");
+
+        VBox mainContent = new VBox(20);
+        mainContent.setPadding(new Insets(20));
         
     	Button inviteUser = new Button("Invite User"); 
         inviteUser.setMaxWidth(500);   
@@ -59,9 +80,9 @@ public class AdminHomePage {
     	changeUserRoleButton.setMaxWidth(500);   
     	changeUserRoleButton.setMinHeight(50);
     	
-    	Button logout = new Button("Logout");
-    	logout.setMaxWidth(500);   
-    	logout.setMinHeight(50);
+    	Button articleButton = new Button("Article Management");
+    	articleButton.setMaxWidth(500);   
+    	articleButton.setMinHeight(50);
     	
     	changeUserRoleButton.setOnAction(e -> {
     		changeUserRole();
@@ -83,15 +104,20 @@ public class AdminHomePage {
             PassReset pass = new PassReset();
             primaryStage.setScene(pass.getScene(primaryStage));
         });
-    	
-        logout.setOnAction(e -> {
+
+        articleButton.setOnAction(e -> {
+            articleManagement articleItem = new articleManagement();
+            primaryStage.setScene(articleItem.getScene(primaryStage));
+        });
+        
+        loggingOut.setOnAction(e -> {
             login loginPart = new login();
             primaryStage.setScene(loginPart.getScene(primaryStage));
         });
         
         VBox contentBox = new VBox(20);
         contentBox.setAlignment(Pos.TOP_CENTER);
-        contentBox.getChildren().addAll(AdminPage, inviteUser, passReset, deleteUser, listUsers, changeUserRoleButton, logout);
+        contentBox.getChildren().addAll(header, inviteUser, passReset, deleteUser, listUsers, changeUserRoleButton, articleButton);
 
         return new Scene(contentBox, 600, 600);
     }

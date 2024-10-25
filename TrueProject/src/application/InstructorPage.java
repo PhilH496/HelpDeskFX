@@ -41,11 +41,23 @@ public class InstructorPage {
         VBox mainContent = new VBox(20);
         mainContent.setPadding(new Insets(20));
         
-        VBox activityList = new VBox(10);
-        activityList.setPadding(new Insets(200));
-        activityList.setStyle("-fx-background-color: white; -fx-border-color: #e0e0e0; -fx-border-radius: 5;");
+    	Button articleButton = new Button("Article Management");
+    	articleButton.setMaxWidth(500);   
+    	articleButton.setMinHeight(50);
         
-        mainContent.getChildren().addAll(activityList);
+        articleButton.setOnAction(e -> {
+            articleManagement articleItem = new articleManagement();
+            primaryStage.setScene(articleItem.getScene(primaryStage));
+        });
+ 
+        //commented out part for future
+      /*  VBox activityList = new VBox(10);
+        activityList.setPadding(new Insets(200));
+        activityList.setStyle("-fx-background-color: white; -fx-border-color: #e0e0e0; -fx-border-radius: 5;");*/
+        
+        // Box layout
+        mainContent.setAlignment(Pos.TOP_CENTER);
+        mainContent.getChildren().addAll(articleButton);
 
         VBox contentBox = new VBox();
         contentBox.getChildren().addAll(header, mainContent);
