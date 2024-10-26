@@ -107,7 +107,7 @@ public class AdminHomePage {
 
         articleButton.setOnAction(e -> {
             articleManagement articleItem = new articleManagement();
-            primaryStage.setScene(articleItem.getScene(primaryStage));
+            primaryStage.setScene(articleItem.getScene(primaryStage, "Admin", null));
         });
         
         loggingOut.setOnAction(e -> {

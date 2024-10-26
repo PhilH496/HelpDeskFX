@@ -47,7 +47,7 @@ public class InstructorPage {
         
         articleButton.setOnAction(e -> {
             articleManagement articleItem = new articleManagement();
-            primaryStage.setScene(articleItem.getScene(primaryStage));
+            primaryStage.setScene(articleItem.getScene(primaryStage, "Instructor", username));
         });
  
         //commented out part for future

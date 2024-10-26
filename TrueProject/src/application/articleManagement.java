@@ -20,7 +20,7 @@ public class articleManagement {
 	private static articleDatabaseHelper articleDHelper;
 	private VBox contentBox;
 
-    public Scene getScene(Stage primaryStage) {
+    public Scene getScene(Stage primaryStage, String userRole, String userName) {
     	articleDHelper = new articleDatabaseHelper();
     	
     	try { 
@@ -55,18 +55,28 @@ public class articleManagement {
         // Setting up actions for each button
         listArticlesButton.setOnAction(e -> {
             listAllArticles listing = new listAllArticles();
-            primaryStage.setScene(listing.getScene(primaryStage));
+            primaryStage.setScene(listing.getScene(primaryStage, userRole, userName));
         });
 
-        createArticleButton.setOnAction(e -> createArticle(primaryStage));
+        createArticleButton.setOnAction(e -> createArticle(primaryStage, userRole, userName));
         
-        deleteArticleButton.setOnAction(e -> deleteArticle(primaryStage));
+        deleteArticleButton.setOnAction(e -> deleteArticle(primaryStage, userRole, userName));
         
         backupRestoreButton.setOnAction(e -> backupRestore(primaryStage));
         
         backButton.setOnAction(e -> {
-            AdminHomePage adminPage = new AdminHomePage();
-            primaryStage.setScene(adminPage.getScene(primaryStage));
+            if (userRole.equals("Instructor")) {
+                InstructorPage instructorPage = new InstructorPage();
+                try {
+					primaryStage.setScene(instructorPage.getScene(primaryStage, userName));
+				} catch (SQLException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
+            } else {
+                AdminHomePage adminPage = new AdminHomePage();
+                primaryStage.setScene(adminPage.getScene(primaryStage));
+            }
         });
         
         // Add all buttons to the content box
@@ -78,7 +88,7 @@ public class articleManagement {
 
     
     // A simple form to create an article
-    private void createArticle(Stage primaryStage) {
+    private void createArticle(Stage primaryStage, String userRole, String userName) {
         VBox createBox = new VBox(10);
         createBox.setAlignment(Pos.CENTER);
         
@@ -108,7 +118,7 @@ public class articleManagement {
                 articleDHelper.articleCreation(titleField.getText(), authorField.getText(), 
                 		abstractArea.getText(), keywordsField.getText(), 
                 		bodyArea.getText(), referencesArea.getText());
-                primaryStage.setScene(getScene(primaryStage)); // Return to main scene after creating article
+                primaryStage.setScene(getScene(primaryStage, userRole, userName)); // Return to main scene after creating article
             } catch (Exception ex) {
                 ex.printStackTrace();
             }
@@ -118,7 +128,7 @@ public class articleManagement {
         Button backButton = new Button("Back");
         backButton.setMaxWidth(250);   
         backButton.setMinHeight(25);
-        backButton.setOnAction(e -> primaryStage.setScene(getScene(primaryStage)));
+        backButton.setOnAction(e -> primaryStage.setScene(getScene(primaryStage, userRole, userName)));
         
         createBox.getChildren().addAll(titleField, authorField, abstractArea, 
         		keywordsField, bodyArea, referencesArea, submitButton, backButton);
@@ -127,7 +137,7 @@ public class articleManagement {
     }
     
     // For deleting an article
-    private void deleteArticle(Stage primaryStage) {
+    private void deleteArticle(Stage primaryStage, String userRole, String userName) {
         // Prompt for article ID
         TextInputDialog idDialog = new TextInputDialog();
         idDialog.setTitle("Delete Article");
@@ -158,7 +168,7 @@ public class articleManagement {
                     successAlert.showAndWait();
 
                     // Return to the main scene
-                    primaryStage.setScene(getScene(primaryStage));
+                    primaryStage.setScene(getScene(primaryStage, userRole, userName));
                 } else {
                     // Canceled deletion message
                     Alert cancelAlert = new Alert(Alert.AlertType.INFORMATION);

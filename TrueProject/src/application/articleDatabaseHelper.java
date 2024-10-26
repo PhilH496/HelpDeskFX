@@ -224,7 +224,36 @@ class articleDatabaseHelper {
 		}
 	}
 	
+	//This portions helps to facilitate the 'search' function and query articles based on keywords
+    public String searchByKeyword(String keyword) throws SQLException {
+        StringBuilder result = new StringBuilder();
+        String query = "SELECT * FROM cse360article WHERE keywords LIKE ?";
 
+        try (PreparedStatement stmt = connection.prepareStatement(query)) {
+            stmt.setString(1, "%" + keyword + "%");
+            ResultSet rs = stmt.executeQuery();
+
+            while (rs.next()) {
+                int id = rs.getInt("id");
+                String title = rs.getString("title");
+                String author = rs.getString("author");
+                String abstracts = rs.getString("abstract");
+                String keywords = rs.getString("keywords");
+                String body = rs.getString("body");
+                String references = rs.getString("references");
+
+                result.append("ID: ").append(id).append("\n")
+                      .append("Title: ").append(title).append("\n")
+                      .append("Author: ").append(author).append("\n")
+                      .append("Abstract: ").append(abstracts).append("\n")
+                      .append("Keywords: ").append(keywords).append("\n")
+                      .append("Body: ").append(body).append("\n")
+                      .append("References: ").append(references).append("\n")
+                      .append("-------------\n");
+            }
+        }
+        return result.toString();
+    }
 
 
 	public void closeConnection() {
