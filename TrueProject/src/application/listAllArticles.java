@@ -66,9 +66,9 @@ public class listAllArticles {
         return new Scene(cb, 600, 600);
     }
 
-    /*Method to display articles based on a keyword search. This part will call upon 
+    /* Method to display articles based on a keyword search. This part will call upon 
      * articleDatabaseHelper and query via keyword 
-    */
+     */
     private void displayArticles(TextArea articlesArea, String keyword) {
         try {
             String articles;

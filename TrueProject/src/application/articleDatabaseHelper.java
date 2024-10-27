@@ -1,9 +1,5 @@
 package application;
 import java.sql.*;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.SQLException;
-import java.sql.Statement;
 import java.io.*;
 /*
  * This portion creates the main database functionalities of when called upon in the main.
@@ -32,12 +28,13 @@ class articleDatabaseHelper {
 			System.err.println("JDBC Driver not found: " + e.getMessage());
 		}
 	}
-	//Used to create database table, adding necessary article items like title, author, abstract, keywords, body, references
+	// Used to create database table, adding necessary article items like ID, level, group title, author, 
+	// abstract, keywords, body, references
 	private void createTables() throws SQLException {
 		String userTable = "CREATE TABLE IF NOT EXISTS cse360article ("
 		        + "id INT AUTO_INCREMENT PRIMARY KEY, "
-		       // + "email VARCHAR(255) UNIQUE, "
-		       // + "password VARCHAR(255), "
+		        + "level VARCHAR(255), "
+		        + "article_group VARCHAR(255), "
 		        + "title VARCHAR(255), "
 		        + "author VARCHAR(255), "
 		        + "abstract VARCHAR(255), "
@@ -47,113 +44,138 @@ class articleDatabaseHelper {
 		statement.execute(userTable);
 	}
 
-	//backedUp will ask for either an input of 'backup' or 'restore' to successfully save data and restore data if accidentally lost
-	//This portion will also write to a specified file 'backup.txt' if backup is inputed to save for 'restore' use
-	public boolean backedUp(String item) {
-	    // Split the input into operation (backup/restore) and file name
-	    String[] parts = item.split(" ", 2);
-
-	    if (parts.length < 2) {
-	        System.out.println("Invalid input. Please provide a file name. Example: 'backup FILEONE' or 'restore FILEONE'");
-	        return false;
+	// Backs up articles to a file, optionally filtered by group.
+	public boolean backUpFile(String file, String userGroup) throws Exception{
+		String sql = null;
+		 // Construct SQL based on groups
+	    if (userGroup.equals("None")) {
+	        sql = "SELECT * FROM cse360article";  // Select all if no specific groups
+	    } else {
+	    	sql = "SELECT * FROM cse360article WHERE article_group = "+ "'" + userGroup + "'";
 	    }
-
-	    String operation = parts[0].toLowerCase();
-	    String fileName = parts[1];
-
-	    try {
-	        if (operation.equals("backup")) {
-	            // Backup articles to the specified file
-	            String articleQuery = "SELECT * FROM cse360article";
-	            try (Statement stmt = connection.createStatement();
-	                 ResultSet rs = stmt.executeQuery(articleQuery);
-	                 BufferedWriter writer = new BufferedWriter(new FileWriter(fileName))) {
-
-	                while (rs.next()) {
-	                    String article = rs.getString("title") + "," +
-	                                     rs.getString("author") + "," +
-	                                     rs.getString("abstract") + "," +
-	                                     rs.getString("keywords") + "," +
-	                                     rs.getString("body") + "," +
-	                                     rs.getString("references");
-	                    writer.write(article);
-	                    writer.newLine();
-	                }
-	                System.out.println("Backup completed successfully to file: " + fileName);
-	                return true;
-
-	            } catch (IOException e) {
-	                System.out.println("Error writing to file: " + fileName);
-	                e.printStackTrace();
+	   
+		Statement stmt = connection.createStatement();
+		ResultSet rs = stmt.executeQuery(sql); 
+		FileWriter myWriter = new FileWriter(file);
+		while(rs.next()) { 
+			String level = rs.getString("level");
+			String group = rs.getString("article_group");
+			String title = rs.getString("title");
+            String author = rs.getString("author");
+            String abstracts = rs.getString("abstract");
+            String keywords = rs.getString("keywords");
+            String body = rs.getString("body");
+            String references = rs.getString("references");
+			try {
+                myWriter.write("Level: " + level + "\n");
+                myWriter.write("Group: " + group + "\n");
+                myWriter.write("Title: " + title + "\n");
+                myWriter.write("Author(s): " + author + "\n");
+                myWriter.write("Abstract: " + abstracts + "\n");
+                myWriter.write("Keyword(s): " + keywords + "\n");
+                myWriter.write("Body: " + body + "\n");
+                myWriter.write("Reference(s): " + references + "\n");
+                myWriter.write("==========\n");
+  
+			} catch(IOException IO) {
+            	System.out.print("Unexpected IO exception occured\n");
+            	return false;
+            }
+		} 
+		myWriter.close();
+		return true;
+	}
+	
+	// loadFromFile loads data from a file and is passed a boolean to determine how it does so. 
+	// True will delete all existing articles and replace them with what is in the specified file.
+	// False will instead update the current database with the data from the file while skipping duplicate titles.
+	public boolean loadFromFile(String file, boolean replaceAll) {
+	    String sql = "INSERT INTO cse360article (level, article_group, title, author, "
+	    		+ "abstract, keywords, body, references) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+	    
+	    try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
+	        BufferedReader reader = new BufferedReader(new FileReader(file));
+	        if (replaceAll) {
+	            // Delete all existing articles
+	            String deleteSQL = "DELETE FROM cse360article";
+	            try (Statement stmt = connection.createStatement()) {
+	                stmt.executeUpdate(deleteSQL);
 	            }
-
-	        } else if (operation.equals("restore")) {
-	            // Restore articles from the specified backup file
-	            String deleteArticles = "DELETE FROM cse360article";
-	            String insertArticle = "INSERT INTO cse360article (title, author, abstract, keywords, body, references) VALUES (?, ?, ?, ?, ?, ?)";
-
-	            try (BufferedReader reader = new BufferedReader(new FileReader(fileName))) {
-	                try (Statement stmt = connection.createStatement()) {
-	                    stmt.executeUpdate(deleteArticles);
-	                }
-
-	                String line;
-	                while ((line = reader.readLine()) != null) {
-	                    String[] fields = line.split(",", 6); // Expecting 6 fields
-
-	                    if (fields.length == 6) {
-	                        try (PreparedStatement pstmt = connection.prepareStatement(insertArticle)) {
-	                            pstmt.setString(1, fields[0]);
-	                            pstmt.setString(2, fields[1]);
-	                            pstmt.setString(3, fields[2]);
-	                            pstmt.setString(4, fields[3]);
-	                            pstmt.setString(5, fields[4]);
-	                            pstmt.setString(6, fields[5]);
-	                            pstmt.executeUpdate();
+	        }
+	        
+	        String line;
+	        String level = null, group = null, title = null, author = null, 
+	        		abstracts = null, keywords = null, body = null, references = null;
+	        
+	        while ((line = reader.readLine()) != null) {
+	            if (line.startsWith("Level: ")) {
+	                level = line.substring(7).trim();
+	            } else if (line.startsWith("Group: ")) {
+	                group = line.substring(7).trim();
+	            } else if (line.startsWith("Title: ")) {
+	                title = line.substring(7).trim();
+	            } else if (line.startsWith("Author(s): ")) {
+	                author = line.substring(11).trim();
+	            } else if (line.startsWith("Abstract: ")) {
+	                abstracts = line.substring(10).trim();
+	            } else if (line.startsWith("Keyword(s): ")) {
+	                keywords = line.substring(12).trim();
+	            } else if (line.startsWith("Body: ")) {
+	                body = line.substring(6).trim();
+	            } else if (line.startsWith("Reference(s): ")) {
+	                references = line.substring(14).trim();
+	            } else if (line.startsWith("==========")) {
+	                // While updating current database, skip adding existing articles based on title.
+	                if (!replaceAll) {
+	                    String checkSQL = "SELECT COUNT(*) FROM cse360article WHERE title = ?";
+	                    try (PreparedStatement checkStmt = connection.prepareStatement(checkSQL)) {
+	                        checkStmt.setString(1, title);
+	                        ResultSet rs = checkStmt.executeQuery();
+	                        if (rs.next() && rs.getInt(1) > 0) {
+	                            // Skip this article if a duplicate is found
+	                            continue;
 	                        }
-	                    } else {
-	                        System.out.println("Invalid data format in backup file: " + fileName);
 	                    }
 	                }
-	                System.out.println("Restore completed successfully from file: " + fileName);
-	                return true;
-
-	            } catch (FileNotFoundException e) {
-	                System.out.println("Backup file not found: " + fileName);
-	                e.printStackTrace();
-	            } catch (IOException e) {
-	                System.out.println("Error reading from file: " + fileName);
-	                e.printStackTrace();
+	                
+	                // Insert the article into the database
+	                pstmt.setString(1, level);
+	                pstmt.setString(2, group);
+	                pstmt.setString(3, title);
+	                pstmt.setString(4, author);
+	                pstmt.setString(5, abstracts);
+	                pstmt.setString(6, keywords);
+	                pstmt.setString(7, body);
+	                pstmt.setString(8, references);
+	                pstmt.executeUpdate();
+	                
+	                // Reset fields for the next article
+	                level = group = title = author = abstracts = keywords = body = references = null;
 	            }
-	        } else {
-	            System.out.println("Invalid operation. Please type 'backup' or 'restore' followed by the file name.");
 	        }
-	    } catch (SQLException e) {
-	        System.out.println("Database error occurred.");
-	        e.printStackTrace();
+	        reader.close();
+	    } catch (IOException | SQLException e) {
+	        System.out.println("Error reading from file: " + e.getMessage());
+	        return false;
 	    }
-
-	    return false;
+	    return true;
 	}
-
 	
-	
-	//deleteArticle will delete a specific article specified by its id number
-	public void deleteArticle(int id) throws SQLException {
-	    String deleteUserQuery = "DELETE FROM cse360article WHERE id = ?";
+	// deleteArticle will delete a specific article specified by its title 
+	public void deleteArticle(String title) throws SQLException {
+	    String deleteUserQuery = "DELETE FROM cse360article WHERE title = ?";
 	    try (PreparedStatement pstmt = connection.prepareStatement(deleteUserQuery)) {
-	        pstmt.setInt(1, id);
+	        pstmt.setString(1, title);
 	        int rowsAffected = pstmt.executeUpdate();
+	        
 	        if (rowsAffected > 0) {
-	            System.out.println("Article ID: " + id + " has been deleted successfully.");
+	            System.out.println("Article with title \"" + title + "\" deleted successfully.");
 	        } else {
-	            System.out.println("No article ID: " + id + " found");
+	            System.out.println("No article found with title \"" + title + "\".");
 	        }
 	    } catch (SQLException e) {
 	        e.printStackTrace();
 	    }
-
-	    
 	}
 	/*
 	 * displayArticles will grab every item in the database for articles and list it out dependent on what the user wants.
@@ -167,7 +189,9 @@ class articleDatabaseHelper {
 	    ResultSet rs = stmt.executeQuery(sql);
 
 	    while (rs.next()) {
-	        int id = rs.getInt("id");
+	    	int id = rs.getInt("id");
+	        String level = rs.getString("level");
+	        String group = rs.getString("article_group");
 	        String title = rs.getString("title");
 	        String author = rs.getString("author");
 	        String abstracts = rs.getString("abstract");
@@ -177,23 +201,22 @@ class articleDatabaseHelper {
 
 	        // Append article details to the StringBuilder
 	        articles.append("ID: ").append(id).append("\n")
+	        		.append("Level: ").append(level).append("\n")
+	        		.append("Group: ").append(group).append("\n")
 	                .append("Title: ").append(title).append("\n")
 	                .append("Author: ").append(author).append("\n")
 	                .append("Abstract: ").append(abstracts).append("\n")
-	                .append("Keywords: ").append(keywords).append("\n")
+	                .append("Keyword(s): ").append(keywords).append("\n")
 	                .append("Body: ").append(body).append("\n")
-	                .append("References: ").append(references).append("\n")
+	                .append("Reference(s): ").append(references).append("\n")
 	                .append("-------------\n");
 	    }
-
 	    rs.close();
 	    stmt.close();
 
 	    // Return the collected articles as a string
 	    return articles.toString();
 	}
-
-	
 	
 	// Check if the database is empty or not
 	public boolean isDatabaseEmpty() throws SQLException {
@@ -205,19 +228,21 @@ class articleDatabaseHelper {
 		return true;
 	}
 	/*
-	 *  articleCreation will just add all the parts the user specifies they want for title, author,
+	 *  articleCreation will just add all the parts the user specifies they want for level, group, title, author,
 	 *  abstract, keywords, body, and references and add it to the database.
 	 */
-	public void articleCreation(String title, String author, String abstracts, String keywords, String body, String references)
-	{
-		String insertArticle = "INSERT INTO cse360article (title, author, abstract, keywords, body, references) VALUES (?, ?, ?, ?, ?, ?)";
+	public void articleCreation(String level, String group, String title, String author, 
+			String abstracts, String keywords, String body, String references) {
+		String insertArticle = "INSERT INTO cse360article (level, article_group, title, author, abstract, keywords, body, references) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
 		try (PreparedStatement pstmt = connection.prepareStatement(insertArticle)) {
-			pstmt.setString(1, title);
-			pstmt.setString(2, author);
-			pstmt.setString(3, abstracts);
-			pstmt.setString(4, keywords);
-			pstmt.setString(5, body);
-			pstmt.setString(6, references);
+			pstmt.setString(1, level);
+			pstmt.setString(2, group);
+			pstmt.setString(3, title);
+			pstmt.setString(4, author);
+			pstmt.setString(5, abstracts);
+			pstmt.setString(6, keywords);
+			pstmt.setString(7, body);
+			pstmt.setString(8, references);
 			pstmt.executeUpdate();
 		} catch (SQLException e) {
 		    e.printStackTrace();
@@ -234,27 +259,30 @@ class articleDatabaseHelper {
             ResultSet rs = stmt.executeQuery();
 
             while (rs.next()) {
-                int id = rs.getInt("id");
-                String title = rs.getString("title");
-                String author = rs.getString("author");
-                String abstracts = rs.getString("abstract");
-                String keywords = rs.getString("keywords");
-                String body = rs.getString("body");
-                String references = rs.getString("references");
+            	int id = rs.getInt("id");
+    	        String level = rs.getString("level");
+    	        String group = rs.getString("article_group");
+    	        String title = rs.getString("title");
+    	        String author = rs.getString("author");
+    	        String abstracts = rs.getString("abstract");
+    	        String keywords = rs.getString("keywords");
+    	        String body = rs.getString("body");
+    	        String references = rs.getString("references");
 
-                result.append("ID: ").append(id).append("\n")
-                      .append("Title: ").append(title).append("\n")
-                      .append("Author: ").append(author).append("\n")
-                      .append("Abstract: ").append(abstracts).append("\n")
-                      .append("Keywords: ").append(keywords).append("\n")
-                      .append("Body: ").append(body).append("\n")
-                      .append("References: ").append(references).append("\n")
-                      .append("-------------\n");
+    	        result.append("ID: ").append(id).append("\n")
+    	        		.append("Level: ").append(level).append("\n")
+    	        		.append("Group: ").append(group).append("\n")
+    	                .append("Title: ").append(title).append("\n")
+    	                .append("Author: ").append(author).append("\n")
+    	                .append("Abstract: ").append(abstracts).append("\n")
+    	                .append("Keyword(s): ").append(keywords).append("\n")
+    	                .append("Body: ").append(body).append("\n")
+    	                .append("Reference(s): ").append(references).append("\n")
+    	                .append("-------------\n");
             }
         }
         return result.toString();
     }
-
 
 	public void closeConnection() {
 		try{ 

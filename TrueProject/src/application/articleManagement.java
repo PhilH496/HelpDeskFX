@@ -1,6 +1,8 @@
 package application;
 
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 import javafx.geometry.Pos;
@@ -8,6 +10,8 @@ import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
+import javafx.scene.control.ChoiceDialog;
+import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
@@ -85,11 +89,10 @@ public class articleManagement {
 
         return new Scene(contentBox, 600, 600);
     }
-
     
     // A simple form to create an article
     private void createArticle(Stage primaryStage, String userRole, String userName) {
-        VBox createBox = new VBox(10);
+    	VBox createBox = new VBox(10);
         createBox.setAlignment(Pos.CENTER);
         
         TextField titleField = new TextField();
@@ -109,14 +112,23 @@ public class articleManagement {
 
         TextArea referencesArea = new TextArea();
         referencesArea.setPromptText("Set of references");
-
+        
+        ComboBox<String> levelComboBox = new ComboBox<>();
+        levelComboBox.getItems().addAll("Beginner", "Intermediate", "Advanced", "Expert");
+        levelComboBox.setPromptText("Select Skill Level");      
+        
+        ComboBox<String> groupsComboBox = new ComboBox<>();
+        groupsComboBox.getItems().addAll("H2 Database", "SQL Fiddle",
+        		"IntelliJ", "Eclipse");
+        groupsComboBox.setPromptText("Select Group");   
+        
         Button submitButton = new Button("Submit");
         submitButton.setMaxWidth(250);   
         submitButton.setMinHeight(25);
         submitButton.setOnAction(e -> {
             try {
-                articleDHelper.articleCreation(titleField.getText(), authorField.getText(), 
-                		abstractArea.getText(), keywordsField.getText(), 
+            	articleDHelper.articleCreation(levelComboBox.getValue(), groupsComboBox.getValue(), titleField.getText(), 
+                		authorField.getText(), abstractArea.getText(), keywordsField.getText(), 
                 		bodyArea.getText(), referencesArea.getText());
                 primaryStage.setScene(getScene(primaryStage, userRole, userName)); // Return to main scene after creating article
             } catch (Exception ex) {
@@ -131,24 +143,23 @@ public class articleManagement {
         backButton.setOnAction(e -> primaryStage.setScene(getScene(primaryStage, userRole, userName)));
         
         createBox.getChildren().addAll(titleField, authorField, abstractArea, 
-        		keywordsField, bodyArea, referencesArea, submitButton, backButton);
+        		keywordsField, bodyArea, referencesArea, levelComboBox, groupsComboBox, submitButton, backButton);
 
         primaryStage.setScene(new Scene(createBox, 600, 600));
     }
     
     // For deleting an article
     private void deleteArticle(Stage primaryStage, String userRole, String userName) {
-        // Prompt for article ID
-        TextInputDialog idDialog = new TextInputDialog();
-        idDialog.setTitle("Delete Article");
-        idDialog.setHeaderText("Delete Article");
-        idDialog.setContentText("Please enter the ID of the article to delete:");
+    	TextInputDialog titleDialog = new TextInputDialog();
+        titleDialog.setTitle("Delete Article");
+        titleDialog.setHeaderText("Delete Article");
+        titleDialog.setContentText("Please enter the title of the article to delete: ");
 
-        Optional<String> result = idDialog.showAndWait();
+        Optional<String> result = titleDialog.showAndWait();
 
-        result.ifPresent(idText -> {
+        result.ifPresent(titleText -> {
             try {
-                int idNumber = Integer.parseInt(idText);
+                String title = result.get();
 
                 // Confirm deletion
                 Alert confirmAlert = new Alert(Alert.AlertType.CONFIRMATION);
@@ -159,7 +170,7 @@ public class articleManagement {
 
                 if (confirmation.isPresent() && confirmation.get() == ButtonType.OK) {
                     // Delete article if confirmed
-                    articleDHelper.deleteArticle(idNumber);
+                    articleDHelper.deleteArticle(title);
 
                     // Show success message
                     Alert successAlert = new Alert(Alert.AlertType.INFORMATION);
@@ -177,77 +188,129 @@ public class articleManagement {
                     cancelAlert.showAndWait();
                 }
             } catch (NumberFormatException ex) {
-                // Handle invalid ID format
+                // Handle invalid title format
                 Alert errorAlert = new Alert(Alert.AlertType.ERROR);
-                errorAlert.setTitle("Invalid ID");
-                errorAlert.setHeaderText("Please enter a valid ID.");
+                errorAlert.setTitle("Invalid Title");
+                errorAlert.setHeaderText("Please enter a valid title.");
                 errorAlert.showAndWait();
             } catch (Exception ex) {
                 ex.printStackTrace();
             }
         });
     }
-
     
-    // For backup/restore actions
+    // Private method that handles the main backup/restore actions based on user input.
+    // It prompts the user to specify either 'Backup' or 'Restore'.
+    // The method calls private methods, handleBackup() or handleRestore(), as appropriate.
     private void backupRestore(Stage primaryStage) {
-        // Prompt user for action (Backup or Restore)
         TextInputDialog actionDialog = new TextInputDialog();
         actionDialog.setTitle("Backup or Restore");
-        actionDialog.setHeaderText("Select your Action");
-        actionDialog.setContentText("Please enter 'Backup (filename)' or 'Restore (filename)':");
+        actionDialog.setHeaderText("Select Action");
+        actionDialog.setContentText("Enter 'Backup' or 'Restore':");
 
-        Optional<String> result = actionDialog.showAndWait();
+        Optional<String> actionResult = actionDialog.showAndWait();
 
-        result.ifPresent(action -> {
-            if (action.contains("Backup") || action.contains("Restore")) {
-                // Confirmation alert
-                Alert confirmAlert = new Alert(Alert.AlertType.CONFIRMATION);
-                confirmAlert.setTitle("Confirmation");
-                confirmAlert.setHeaderText("Are you sure you want to proceed with " + action + "?");
-
-                Optional<ButtonType> confirmation = confirmAlert.showAndWait();
-
-                if (confirmation.isPresent() && confirmation.get() == ButtonType.OK) {
-                    try {
-                        // Perform the backup or restore action
-                        if (articleDHelper.backedUp(action) == true)
-                        {
-
-                        	// Success message
-                        	Alert successAlert = new Alert(Alert.AlertType.INFORMATION);
-                        	successAlert.setTitle("Success");
-                        	successAlert.setHeaderText(action + " has been completed successfully.");
-                        	successAlert.showAndWait();
-                        }
-                        else
-                        {
-                        	// Fail message
-                        	Alert failAlert = new Alert(Alert.AlertType.INFORMATION);
-                        	failAlert.setTitle("Failed");
-                        	failAlert.setHeaderText(action + " has failed. Unable to find specified filename.");
-                        	failAlert.showAndWait();
-                        }
-                    
-
-                    } catch (Exception ex) {
-                        ex.printStackTrace();
-                    }
-                } else {
-                    // Cancel
-                    Alert cancelAlert = new Alert(Alert.AlertType.INFORMATION);
-                    cancelAlert.setTitle("Action Cancelled");
-                    cancelAlert.setHeaderText(action + " action was canceled.");
-                    cancelAlert.showAndWait();
-                }
+        actionResult.ifPresent(action -> {
+            if (action.equalsIgnoreCase("Backup")) {
+                handleBackup();
+            } else if (action.equalsIgnoreCase("Restore")) {
+                handleRestore();
             } else {
-                // Invalid action
-                Alert errorAlert = new Alert(Alert.AlertType.ERROR);
-                errorAlert.setTitle("Invalid Action");
-                errorAlert.setHeaderText("Please enter 'Backup (filename)' or 'Restore (filename)'.");
-                errorAlert.showAndWait();
+                Alert alert = new Alert(Alert.AlertType.ERROR);
+                alert.setTitle("Invalid Action");
+                alert.setHeaderText("Please enter 'Backup' or 'Restore'.");
+                alert.showAndWait();
             }
         });
     }
+    
+	 // Private method performs the backup action.
+	 // Prompts the user to select a group (e.g., "H2 Database", "SQL Fiddle") and specify a backup filename.
+    private void handleBackup() {
+        // Prompt for group (optional) and filename
+        List<String> groups = new ArrayList<>();
+  	    groups.add("H2 Database");
+  	    groups.add("SQL Fiddle");
+  	    groups.add("Eclipse");
+  	    groups.add("IntelliJ");
+  	    groups.add("None");
 
+  	    ChoiceDialog<String> group = new ChoiceDialog<>("None", groups);
+  	    group.setContentText("Select a group: ");
+  	    Optional<String> outGroup = group.showAndWait();
+  	    String userGroup = outGroup.get();
+  	    
+        TextInputDialog fileDialog = new TextInputDialog();
+        fileDialog.setTitle("Backup Filename");
+        fileDialog.setHeaderText("Specify Backup Filename: ");
+        Optional<String> fileResult = fileDialog.showAndWait();
+        
+        fileResult.ifPresent(file -> {
+        	try {
+				if(articleDHelper.backUpFile(file, userGroup)) {
+					Alert successAlert = new Alert(Alert.AlertType.INFORMATION);
+                    successAlert.setTitle("Success");
+                    successAlert.setHeaderText("Articles backed up successfully.");
+                    successAlert.showAndWait();
+				} else {
+					Alert failureAlert = new Alert(Alert.AlertType.INFORMATION);
+					failureAlert.setTitle("Failure");
+					failureAlert.setHeaderText("Articles were not saved to file.");
+					failureAlert.showAndWait();
+				}
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+        });
+    }
+    
+	 // Private method that performs the restore action.
+	 // Prompts the user to enter a filename for restoring data, then asks the user to choose 
+     // between replacing the entire database or updating existing entries.
+    private void handleRestore() {
+        TextInputDialog fileDialog = new TextInputDialog();
+        fileDialog.setTitle("Restore Filename");
+        fileDialog.setHeaderText("Specify Restore Filename:");
+        Optional<String> fileResult = fileDialog.showAndWait();
+
+        fileResult.ifPresent(file -> {
+            Alert confirmDialog = new Alert(Alert.AlertType.CONFIRMATION);
+            confirmDialog.setTitle("Restore Options");
+            confirmDialog.setHeaderText("Choose Restore Method");
+            confirmDialog.setContentText("Would you like to replace the entire database or update existing entries?");
+
+            ButtonType replaceButton = new ButtonType("Replace All");
+            ButtonType updateButton = new ButtonType("Update Existing");
+            ButtonType cancelButton = new ButtonType("Cancel");
+
+            confirmDialog.getButtonTypes().setAll(replaceButton, updateButton, cancelButton);
+            Optional<ButtonType> result = confirmDialog.showAndWait();
+            
+            Alert successAlert = new Alert(Alert.AlertType.INFORMATION);
+            Alert failureAlert = new Alert(Alert.AlertType.INFORMATION);
+            if (result.isPresent()) {
+                if (result.get() == replaceButton) {  // true for complete replacement
+                    if(articleDHelper.loadFromFile(file, true)) {
+                        successAlert.setTitle("Success");
+                        successAlert.setHeaderText("Articles were succesfully replaced from back up.");
+                        successAlert.showAndWait();
+    				} else {
+    					failureAlert.setTitle("Failure");
+    					failureAlert.setHeaderText("Unexepcted error occured when restoring files");
+    					failureAlert.showAndWait();
+    				}
+                } else if (result.get() == updateButton) {
+                    if(articleDHelper.loadFromFile(file, false)) { // false for update mode
+                        successAlert.setTitle("Success");
+                        successAlert.setHeaderText("Articles updated successfully.");
+                        successAlert.showAndWait();
+    				} else {
+    					failureAlert.setTitle("Failure");
+    					failureAlert.setHeaderText("Unexpected error occured when restoring files.");
+    					failureAlert.showAndWait();
+    				}
+                }
+            }
+        });
+    }
 }
