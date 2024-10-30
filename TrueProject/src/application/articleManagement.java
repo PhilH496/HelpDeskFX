@@ -4,7 +4,6 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
@@ -18,6 +17,10 @@ import javafx.scene.control.TextField;
 import javafx.scene.control.TextInputDialog;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
+/*
+ * This portion is the article management GUI page that sets up the buttons and
+ * actions for what each button does and should do
+ */
 
 public class articleManagement {
 	
@@ -35,7 +38,7 @@ public class articleManagement {
 			e.printStackTrace();
 		}
     	
-    	// Creating the UI layout
+    	// This parts creates the UI layout for button placement and label
         contentBox = new VBox(20);
         contentBox.setAlignment(Pos.TOP_CENTER);
         Label label = new Label("Article Management");
@@ -74,7 +77,6 @@ public class articleManagement {
                 try {
 					primaryStage.setScene(instructorPage.getScene(primaryStage, userName));
 				} catch (SQLException e1) {
-					// TODO Auto-generated catch block
 					e1.printStackTrace();
 				}
             } else {
@@ -83,14 +85,16 @@ public class articleManagement {
             }
         });
         
-        // Add all buttons to the content box
+        // Add all buttons here to display on the page
         contentBox.getChildren().addAll(label, listArticlesButton, createArticleButton, 
         		deleteArticleButton, backupRestoreButton, backButton);
 
         return new Scene(contentBox, 600, 600);
     }
     
-    // A simple form to create an article
+    // Create article will make a form that creates textfields and save its data
+    // to the article database. Additionally, additional buttons are placed to
+    // select skill level and groups
     private void createArticle(Stage primaryStage, String userRole, String userName) {
     	VBox createBox = new VBox(10);
         createBox.setAlignment(Pos.CENTER);
@@ -135,8 +139,6 @@ public class articleManagement {
                 ex.printStackTrace();
             }
         });
-
-        // Back button
         Button backButton = new Button("Back");
         backButton.setMaxWidth(250);   
         backButton.setMinHeight(25);
@@ -148,7 +150,8 @@ public class articleManagement {
         primaryStage.setScene(new Scene(createBox, 600, 600));
     }
     
-    // For deleting an article
+    // This part deletes the article and sends a confirmation on if the user really
+    // wants to delete the article. It will also confirm if the article title exists
     private void deleteArticle(Stage primaryStage, String userRole, String userName) {
     	TextInputDialog titleDialog = new TextInputDialog();
         titleDialog.setTitle("Delete Article");

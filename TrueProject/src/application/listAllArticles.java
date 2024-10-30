@@ -13,12 +13,17 @@ import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.stage.Stage;
 
+/*
+ * listAllArticles will list every article via a new page
+ * This class will also create the 'search' method to find specific articles
+ * and decide to either display the article or not
+ */
+
 public class listAllArticles {
     private static articleDatabaseHelper articleDHelper;
 
     public Scene getScene(Stage primaryStage, String userRole, String userName) {
         articleDHelper = new articleDatabaseHelper();
-        //Launches articleDatabase
         try { 
             articleDHelper.connectToDatabase(); 
             System.out.println("Welcome to article management!"); 
@@ -40,7 +45,7 @@ public class listAllArticles {
         // Display all articles when loading up
         displayArticles(articlesArea, null);
 
-        //Search for specific article using keyword
+        //Here you can search for specific article using keyword
         TextField searchField = new TextField();
         searchField.setPromptText("Enter keyword to search");
 
@@ -53,7 +58,7 @@ public class listAllArticles {
         HBox searchBox = new HBox(10, searchField, searchButton);
         searchBox.setAlignment(Pos.CENTER);
 
-        // Back/return button
+        // Back/return button to main adminpage
         Button backButton = new Button("Return");
         backButton.setMaxWidth(250);
         backButton.setMinHeight(25);
