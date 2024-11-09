@@ -4,6 +4,7 @@ import java.sql.SQLException;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
@@ -43,19 +44,29 @@ public class listAllArticles {
         articlesArea.setEditable(false); 
 
         // Display all articles when loading up
-        displayArticles(articlesArea, null);
+        displayArticles(articlesArea, null, null, userRole);
 
         //Here you can search for specific article using keyword
         TextField searchField = new TextField();
-        searchField.setPromptText("Enter keyword to search");
+        searchField.setPromptText("Search by title, author, abstract, or keywords");
+        
+        ComboBox<String> levelComboBox = new ComboBox<>();
+        levelComboBox.getItems().addAll("Beginner", "Intermediate", "Advanced", "Expert", "All");
+        levelComboBox.setPromptText("Display Skill Level");   
 
         Button searchButton = new Button("Search");
         searchButton.setOnAction(e -> {
             String keyword = searchField.getText().trim();
-            displayArticles(articlesArea, keyword);
+            String skillLevel = levelComboBox.getValue();
+            if (skillLevel == null || skillLevel.equals("Display Skill Level") || skillLevel.equals("All")) {
+                skillLevel = null;
+            }
+            
+            displayArticles(articlesArea, keyword, skillLevel, userRole);
+            
         });
         
-        HBox searchBox = new HBox(10, searchField, searchButton);
+        HBox searchBox = new HBox(10, searchField, levelComboBox, searchButton);
         searchBox.setAlignment(Pos.CENTER);
 
         // Back/return button to main adminpage
@@ -74,14 +85,14 @@ public class listAllArticles {
     /* Method to display articles based on a keyword search. This part will call upon 
      * articleDatabaseHelper and query via keyword 
      */
-    private void displayArticles(TextArea articlesArea, String keyword) {
+    private void displayArticles(TextArea articlesArea, String keyword, String skillLevel, String userRole) {
         try {
             String articles;
-            if (keyword == null || keyword.isEmpty()) {
-                articles = articleDHelper.displayArticles(); // Display all if no keyword is provided
+            if (keyword == null || keyword.isEmpty() && (skillLevel == null || skillLevel.isEmpty())) {
+                articles = articleDHelper.displayArticles(userRole); // Display all if no keyword is provided
             } 
             else {
-                articles = articleDHelper.searchByKeyword(keyword); // Search by keyword
+                articles = articleDHelper.searchByKeywordAndLevel(keyword, skillLevel); // Search by keyword/level
                 if (articles.isEmpty())
                 {
                 	articles = "No articles Found!";

@@ -15,6 +15,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TextInputDialog;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 /*
@@ -55,6 +56,10 @@ public class articleManagement {
         Button backupRestoreButton = new Button("Backup/Restore Articles");
         backupRestoreButton.setMaxWidth(500);   
         backupRestoreButton.setMinHeight(50);
+        Button deleteUserFromSpecialGroup = new Button("Delete User From Group");
+        deleteUserFromSpecialGroup.setMaxWidth(500);   
+        deleteUserFromSpecialGroup.setMinHeight(50);
+        
         Button backButton = new Button("Back");
         backButton.setMaxWidth(500);   
         backButton.setMinHeight(50);
@@ -87,7 +92,7 @@ public class articleManagement {
         
         // Add all buttons here to display on the page
         contentBox.getChildren().addAll(label, listArticlesButton, createArticleButton, 
-        		deleteArticleButton, backupRestoreButton, backButton);
+        		deleteArticleButton, backupRestoreButton, deleteUserFromSpecialGroup, backButton);
 
         return new Scene(contentBox, 600, 600);
     }
@@ -126,12 +131,45 @@ public class articleManagement {
         		"IntelliJ", "Eclipse");
         groupsComboBox.setPromptText("Select Group");   
         
+        ComboBox<String> groupTypeComboBox = new ComboBox<>();
+        groupTypeComboBox.getItems().addAll("General Group", "Special Group");
+        groupTypeComboBox.setPromptText("Select Group Type");   
+        
+        groupTypeComboBox.setOnAction(event -> {
+            String selectedGroup = groupTypeComboBox.getValue();
+
+            if ("Special Group".equals(selectedGroup)) {
+                // Show input dialog to enter the name for "Special Group"
+                TextInputDialog dialog = new TextInputDialog();
+                dialog.setTitle("Special Group Name");
+                dialog.setHeaderText("Enter a name for the Special Group:");
+                dialog.setContentText("Group Name:");
+
+                // Get the entered name
+                dialog.showAndWait().ifPresent(name -> {
+                    if (!name.isEmpty()) {
+                        // Optionally add the new name to the ComboBox or perform other actions
+                        groupTypeComboBox.getItems().add(name);
+                        groupTypeComboBox.setValue(name); // Select the new group name
+                    } else {
+                        // Alert if no name was entered
+                        Alert alert = new Alert(Alert.AlertType.WARNING, "Please enter a valid group name.", ButtonType.OK);
+                        alert.showAndWait();
+                        groupTypeComboBox.setValue(null); // Reset selection
+                    }
+                });
+            }
+        });
+        
+        HBox horizontalLayoutForButtons = new HBox(5, levelComboBox, groupsComboBox, groupTypeComboBox);
+        horizontalLayoutForButtons.setAlignment(Pos.CENTER);
+        
         Button submitButton = new Button("Submit");
         submitButton.setMaxWidth(250);   
         submitButton.setMinHeight(25);
         submitButton.setOnAction(e -> {
             try {
-            	articleDHelper.articleCreation(levelComboBox.getValue(), groupsComboBox.getValue(), titleField.getText(), 
+            	articleDHelper.articleCreation(groupTypeComboBox.getValue(), levelComboBox.getValue(), groupsComboBox.getValue(), titleField.getText(), 
                 		authorField.getText(), abstractArea.getText(), keywordsField.getText(), 
                 		bodyArea.getText(), referencesArea.getText());
                 primaryStage.setScene(getScene(primaryStage, userRole, userName)); // Return to main scene after creating article
@@ -145,7 +183,7 @@ public class articleManagement {
         backButton.setOnAction(e -> primaryStage.setScene(getScene(primaryStage, userRole, userName)));
         
         createBox.getChildren().addAll(titleField, authorField, abstractArea, 
-        		keywordsField, bodyArea, referencesArea, levelComboBox, groupsComboBox, submitButton, backButton);
+        		keywordsField, bodyArea, referencesArea, horizontalLayoutForButtons, submitButton, backButton);
 
         primaryStage.setScene(new Scene(createBox, 600, 600));
     }
