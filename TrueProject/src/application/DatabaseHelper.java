@@ -117,9 +117,15 @@ class DatabaseHelper {
 	}
 	
 	// Method to return all users stored in the database into an ArrayList
-	public ArrayList<User> getAllUsers() throws SQLException{
+	public ArrayList<User> getAllUsers(String specifiedRole) throws SQLException{
         ArrayList<User> users = new ArrayList<User>();
-		String sql = "SELECT * FROM cse360users"; 
+        String sql = null;
+		 // Construct SQL based on groups
+	    if (specifiedRole.equals("None")) {
+	        sql = "SELECT * FROM cse360users";  // Select all if no specific groups
+	    } else {
+	    	sql = "SELECT * FROM cse360users WHERE role = "+ "'" + specifiedRole + "'";
+	    }
 		Statement stmt = connection.createStatement();
 		ResultSet rs = stmt.executeQuery(sql); 
 

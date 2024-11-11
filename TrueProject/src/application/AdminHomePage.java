@@ -164,7 +164,7 @@ public class AdminHomePage {
     private static void displayUsers(Stage primaryStage) {
     	try {
     		databaseHelper.connectToDatabase();  
-            List<User> users = databaseHelper.getAllUsers();
+            List<User> users = databaseHelper.getAllUsers("None");
 			databaseHelper.closeConnection();    
 			
 	        TableView<User> table = new TableView<>();

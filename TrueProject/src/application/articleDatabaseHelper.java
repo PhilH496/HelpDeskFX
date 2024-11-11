@@ -33,7 +33,7 @@ class articleDatabaseHelper {
 	// Used to create database table, adding necessary article items like ID, level, group title, author, 
 	// abstract, keywords, body, references
 	private void createTables() throws SQLException {
-		String userTable = "CREATE TABLE IF NOT EXISTS cse360data ("
+		String userTable = "CREATE TABLE IF NOT EXISTS cse360article ("
 				+ "groupType VARCHAR(255), "
 		        + "id INT AUTO_INCREMENT PRIMARY KEY, "
 		        + "level VARCHAR(255), "
@@ -52,9 +52,9 @@ class articleDatabaseHelper {
 		String sql = null;
 		 // Construct SQL based on groups
 	    if (userGroup.equals("None")) {
-	        sql = "SELECT * FROM cse360data";  // Select all if no specific groups
+	        sql = "SELECT * FROM cse360article";  // Select all if no specific groups
 	    } else {
-	    	sql = "SELECT * FROM cse360data WHERE article_group = "+ "'" + userGroup + "'";
+	    	sql = "SELECT * FROM cse360article WHERE article_group = "+ "'" + userGroup + "'";
 	    }
 	   
 		Statement stmt = connection.createStatement();
@@ -95,14 +95,14 @@ class articleDatabaseHelper {
 	// True will delete all existing articles and replace them with what is in the specified file.
 	// False will instead update the current database with the data from the file while skipping duplicate titles.
 	public boolean loadFromFile(String file, boolean replaceAll) {
-	    String sql = "INSERT INTO cse360data (groupType, level, article_group, title, author, "
+	    String sql = "INSERT INTO cse360article (groupType, level, article_group, title, author, "
 	    		+ "abstract, keywords, body, references) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
 	    
 	    try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
 	        BufferedReader reader = new BufferedReader(new FileReader(file));
 	        if (replaceAll) {
 	            // Delete all existing articles
-	            String deleteSQL = "DELETE FROM cse360data";
+	            String deleteSQL = "DELETE FROM cse360article";
 	            try (Statement stmt = connection.createStatement()) {
 	                stmt.executeUpdate(deleteSQL);
 	            }
@@ -134,7 +134,7 @@ class articleDatabaseHelper {
 	            } else if (line.startsWith("==========")) {
 	                // While updating current database, skip adding existing articles based on title.
 	                if (!replaceAll) {
-	                    String checkSQL = "SELECT COUNT(*) FROM cse360data WHERE title = ?";
+	                    String checkSQL = "SELECT COUNT(*) FROM cse360article WHERE title = ?";
 	                    try (PreparedStatement checkStmt = connection.prepareStatement(checkSQL)) {
 	                        checkStmt.setString(1, title);
 	                        ResultSet rs = checkStmt.executeQuery();
@@ -171,7 +171,7 @@ class articleDatabaseHelper {
 	
 	// deleteArticle will delete a specific article specified by its title 
 	public void deleteArticle(String title) throws SQLException {
-	    String deleteUserQuery = "DELETE FROM cse360data WHERE title = ?";
+	    String deleteUserQuery = "DELETE FROM cse360article WHERE title = ?";
 	    try (PreparedStatement pstmt = connection.prepareStatement(deleteUserQuery)) {
 	        pstmt.setString(1, title);
 	        int rowsAffected = pstmt.executeUpdate();
@@ -192,7 +192,7 @@ class articleDatabaseHelper {
 	 */
 	public String displayArticles(String userRole) throws Exception {
 	    StringBuilder articles = new StringBuilder();
-	    String sql = "SELECT * FROM cse360data"; 
+	    String sql = "SELECT * FROM cse360article"; 
 	    Statement stmt = connection.createStatement();
 	    ResultSet rs = stmt.executeQuery(sql);
 	    
@@ -291,7 +291,7 @@ class articleDatabaseHelper {
 	
 	// Check if the database is empty or not
 	public boolean isDatabaseEmpty() throws SQLException {
-		String query = "SELECT COUNT(*) AS count FROM cse360data";
+		String query = "SELECT COUNT(*) AS count FROM cse360article";
 		ResultSet resultSet = statement.executeQuery(query);
 		if (resultSet.next()) {
 			return resultSet.getInt("count") == 0;
@@ -304,7 +304,7 @@ class articleDatabaseHelper {
 	 */
 	public void articleCreation(String groupType, String level, String group, String title, String author, 
 			String abstracts, String keywords, String body, String references) {
-		String insertArticle = "INSERT INTO cse360data (groupType, level, article_group, title, author, abstract, keywords, body, references) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
+		String insertArticle = "INSERT INTO cse360article (groupType, level, article_group, title, author, abstract, keywords, body, references) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
 		try (PreparedStatement pstmt = connection.prepareStatement(insertArticle)) {
 			pstmt.setString(1, groupType);
 			pstmt.setString(2, level);
@@ -324,7 +324,7 @@ class articleDatabaseHelper {
 	//This portions helps to facilitate the 'search' function and query articles based on keywords
     public String searchByKeywordAndLevel(String keyword, String skillLevel) throws SQLException {
         StringBuilder result = new StringBuilder();
-        StringBuilder query = new StringBuilder("SELECT * FROM cse360data WHERE (keywords LIKE ? OR title LIKE ? OR author LIKE ? OR abstract LIKE ?)");
+        StringBuilder query = new StringBuilder("SELECT * FROM cse360article WHERE (keywords LIKE ? OR title LIKE ? OR author LIKE ? OR abstract LIKE ?)");
         if ((skillLevel != null) && (!skillLevel.isEmpty()))
         {
         	query.append(" AND level = ?");
