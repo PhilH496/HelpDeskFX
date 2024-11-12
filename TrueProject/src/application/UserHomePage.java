@@ -1,13 +1,20 @@
 package application;
 
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.control.ChoiceDialog;
 import javafx.scene.control.Label;
+import javafx.scene.control.TextInputDialog;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
 import javafx.scene.text.Font;
@@ -50,9 +57,13 @@ public class UserHomePage {
     	articleButton.setMaxWidth(500);   
     	articleButton.setMinHeight(50);
     	
+    	helpButton.setOnAction(e -> {
+            sendMessage();
+        });
+    	
         articleButton.setOnAction(e -> {
-            articleManagement articleItem = new articleManagement();
-            primaryStage.setScene(articleItem.getScene(primaryStage, "Student", username));
+            listAllArticles articleList= new listAllArticles();
+            primaryStage.setScene(articleList.getScene(primaryStage, "Student", username));
         });
         
         // Box layout
@@ -76,5 +87,36 @@ public class UserHomePage {
         String prefName = db.getPrefName(username);
         db.closeConnection();
         return prefName;
+    }
+    
+    private void sendMessage() {
+    	List<String> messageOptions = new ArrayList<>();
+    	messageOptions.add("Generic");
+    	messageOptions.add("Specific");
+
+  	    ChoiceDialog<String> type = new ChoiceDialog<>("Generic", messageOptions);
+  	    type.setContentText("Select a message type:");
+
+  	    TextInputDialog messageInput = new TextInputDialog();
+  	    messageInput.setHeaderText("Enter your message:");
+
+  	    Optional<String> messageOutput = messageInput.showAndWait();
+  	    if (messageOutput.isPresent()) {							// If the email was entered
+  	        String message = messageOutput.get(); 
+  	        
+  	        Optional<String> out = type.showAndWait();	
+  	        if (out.isPresent()) {							// If the role was chosen
+  	            String messageType = out.get();
+
+  	            // Change the role of the user
+  	            System.out.print("Message posted: " + message + " as " + messageType);
+  	        } else {
+  	        	Label roleInputCanceled = new Label("Message type not selected");
+  	        	roleInputCanceled.setTextFill(Color.RED);
+  	        }
+  	    } else {
+  	    	Label usernameInputCanceled = new Label("Message input was canceled");
+  	    	usernameInputCanceled.setTextFill(Color.RED);
+  	    }
     }
 }

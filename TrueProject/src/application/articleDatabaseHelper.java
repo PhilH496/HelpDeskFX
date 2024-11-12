@@ -60,6 +60,7 @@ class articleDatabaseHelper {
 		Statement stmt = connection.createStatement();
 		ResultSet rs = stmt.executeQuery(sql); 
 		FileWriter myWriter = new FileWriter(file);
+		int count = 0;
 		while(rs.next()) { 
 			String groupType = rs.getString("groupType");
 			String level = rs.getString("level");
@@ -86,7 +87,7 @@ class articleDatabaseHelper {
             	System.out.print("Unexpected IO exception occured\n");
             	return false;
             }
-		} 
+		}
 		myWriter.close();
 		return true;
 	}
@@ -221,12 +222,15 @@ class articleDatabaseHelper {
         }
 	    return article.toString();
 	}
+	
 	public String displayArticles(String userRole) throws Exception {
-	    StringBuilder articles = new StringBuilder();
+	    StringBuilder articleDetails = new StringBuilder();
+	    StringBuilder result = new StringBuilder();
 	    String sql = "SELECT * FROM cse360article"; 
 	    Statement stmt = connection.createStatement();
 	    ResultSet rs = stmt.executeQuery(sql);
 	    
+	    int count = 0;
 	    while (rs.next()) {
 	    	String groupType = rs.getString("groupType");
 	    	int id = rs.getInt("id");
@@ -241,7 +245,7 @@ class articleDatabaseHelper {
 	        
 
 	        // Append article details to the StringBuilder
-	        articles.append("Group Type: ").append(groupType).append("\n")
+	        articleDetails.append("Group Type: ").append(groupType).append("\n")
 	        		.append("ID: ").append(id).append("\n")
 	        		.append("Level: ").append(level).append("\n")
 	        		.append("Group: ").append(group).append("\n")
@@ -309,13 +313,15 @@ class articleDatabaseHelper {
 	       // System.out.println("References: " + decryptedReferences);
 	       // System.out.println("-------------");	        
 	        
-	       
+	       count++;
 	    }
+	    result.append("Total Article Count: " + count + "\n\n");
+        result.append(articleDetails);
 	    rs.close();
 	    stmt.close();
 
 	    // Return the collected articles as a string
-	    return articles.toString();
+	    return result.toString();
 	}
 	
 	// Check if the database is empty or not
@@ -352,6 +358,7 @@ class articleDatabaseHelper {
 	
 	//This portions helps to facilitate the 'search' function and query articles based on keywords
     public String searchByKeywordAndLevel(String keyword, String skillLevel) throws SQLException {
+        StringBuilder articleDetails = new StringBuilder();
         StringBuilder result = new StringBuilder();
         StringBuilder query = new StringBuilder("SELECT * FROM cse360article WHERE (keywords LIKE ? OR title LIKE ? OR author LIKE ? OR abstract LIKE ?)");
         if ((skillLevel != null) && (!skillLevel.isEmpty()))
@@ -369,9 +376,9 @@ class articleDatabaseHelper {
             if (skillLevel != null && !skillLevel.isEmpty()) {
                 stmt.setString(5, skillLevel);
             }
-            
             ResultSet rs = stmt.executeQuery();
-
+            
+            int count = 0;
             while (rs.next()) {
             	int id = rs.getInt("id");
     	        String level = rs.getString("level");
@@ -381,7 +388,7 @@ class articleDatabaseHelper {
     	        String abstracts = rs.getString("abstract");
     	        String keywords = rs.getString("keywords");
 
-    	        result.append("Sequence Number: ").append(id).append("\n")
+    	        articleDetails.append("Sequence Number: ").append(id).append("\n")
     	        		.append("Level: ").append(level).append("\n")
     	        		.append("Group: ").append(group).append("\n")
     	                .append("Title: ").append(title).append("\n")
@@ -389,7 +396,10 @@ class articleDatabaseHelper {
     	                .append("Abstract: ").append(abstracts).append("\n")
     	                .append("Keyword(s): ").append(keywords).append("\n")
     	                .append("-------------\n");
+    	        count++;
             }
+            result.append("Total Article Count: " + count + "\n\n");
+            result.append(articleDetails);
         }
         return result.toString();
     }
