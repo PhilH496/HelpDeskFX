@@ -190,6 +190,37 @@ class articleDatabaseHelper {
 	 * Besides the title, author, and id number, everything else will be encrypted and only decrypted when called upon. This
 	 * feature will be added later on.
 	 */
+	public String viewArticle(int sequenceNumber) throws SQLException {
+		String findUserQuery = "SELECT * FROM cse360article WHERE id = ?";
+		StringBuilder article = new StringBuilder();
+	    try (PreparedStatement stmt = connection.prepareStatement(findUserQuery)) {
+            stmt.setInt(1, sequenceNumber);
+            ResultSet rs = stmt.executeQuery();
+            while (rs.next()) {
+            	int id = rs.getInt("id");
+    	        String level = rs.getString("level");
+    	        String group = rs.getString("article_group");
+    	        String title = rs.getString("title");
+    	        String author = rs.getString("author");
+    	        String abstracts = rs.getString("abstract");
+    	        String keywords = rs.getString("keywords");
+    	        String body = rs.getString("body");
+    	        String references = rs.getString("references");
+
+    	        article.append("Sequence Number: ").append(id).append("\n")
+    	        		.append("Level: ").append(level).append("\n")
+    	        		.append("Group: ").append(group).append("\n")
+    	                .append("Title: ").append(title).append("\n")
+    	                .append("Author: ").append(author).append("\n")
+    	                .append("Abstract: ").append(abstracts).append("\n")
+    	                .append("Keyword(s): ").append(keywords).append("\n")
+    	                .append("Body: ").append(body).append("\n")
+    	                .append("Reference(s): ").append(references).append("\n")
+    	                .append("-------------\n");
+            }
+        }
+	    return article.toString();
+	}
 	public String displayArticles(String userRole) throws Exception {
 	    StringBuilder articles = new StringBuilder();
 	    String sql = "SELECT * FROM cse360article"; 
@@ -205,8 +236,8 @@ class articleDatabaseHelper {
 	        String author = rs.getString("author");
 	        String abstracts = rs.getString("abstract");
 	        String keywords = rs.getString("keywords");
-	        String body = rs.getString("body");
-	        String references = rs.getString("references");
+	        //String body = rs.getString("body");
+	        //String references = rs.getString("references");
 	        
 
 	        // Append article details to the StringBuilder
@@ -217,12 +248,10 @@ class articleDatabaseHelper {
 	                .append("Title: ").append(title).append("\n")
 	                .append("Author: ").append(author).append("\n")
 	                .append("Abstract: ").append(abstracts).append("\n")
-	                .append("Keyword(s): ").append(keywords).append("\n");
-	                //.append("Body: ").append(body).append("\n")
-	                //.append("Reference(s): ").append(references).append("\n")
-	                //.append("-------------\n");
+	                .append("Keyword(s): ").append(keywords).append("\n")
+	        		.append("-------------\n");
 	        
-	        //If admin, hide body and references
+	        /*If admin, hide body and references
 	        if (!userRole.equals("Admin")) {
 	            articles.append("Body: ").append(body).append("\n")
                 .append("Reference(s): ").append(references).append("\n");
@@ -230,8 +259,8 @@ class articleDatabaseHelper {
 	            articles.append("Body: [Hidden]\n")
 	                    .append("Reference(s): [Hidden]\n");
 	        }
-
-	        articles.append("-------------\n");
+			*/
+	        //articles.append("-------------\n");
 	        
 	  /*
 	   * This part will encrypt all the fields we want encrypted
@@ -351,18 +380,14 @@ class articleDatabaseHelper {
     	        String author = rs.getString("author");
     	        String abstracts = rs.getString("abstract");
     	        String keywords = rs.getString("keywords");
-    	        String body = rs.getString("body");
-    	        String references = rs.getString("references");
 
-    	        result.append("ID: ").append(id).append("\n")
+    	        result.append("Sequence Number: ").append(id).append("\n")
     	        		.append("Level: ").append(level).append("\n")
     	        		.append("Group: ").append(group).append("\n")
     	                .append("Title: ").append(title).append("\n")
     	                .append("Author: ").append(author).append("\n")
     	                .append("Abstract: ").append(abstracts).append("\n")
     	                .append("Keyword(s): ").append(keywords).append("\n")
-    	                .append("Body: ").append(body).append("\n")
-    	                .append("Reference(s): ").append(references).append("\n")
     	                .append("-------------\n");
             }
         }

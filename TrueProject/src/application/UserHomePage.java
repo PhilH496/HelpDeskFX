@@ -22,12 +22,11 @@ import javafx.stage.Stage;
 public class UserHomePage {
 	// Method to create and return the UI for the user homepage
     public Scene getScene(Stage primaryStage, String username) throws SQLException {
-        Label titleLabel = new Label("ASU Help System");
+    	Label titleLabel = new Label("ASU Help System");
         titleLabel.setFont(Font.font("Roboto", FontWeight.BOLD, 20));
         
         
-        String prefName = "Student";
-		prefName = getPrefName(username);
+		final String prefName = getPrefName(username);
         Label welcomeLabel = new Label("Welcome, " + prefName);
         Button logout = new Button("Logout");
         
@@ -43,18 +42,22 @@ public class UserHomePage {
         VBox mainContent = new VBox(20);
         mainContent.setPadding(new Insets(20));
         
-        HBox coursesBox = createMenuItemBox("My Courses", "Access your enrolled courses");
-        HBox scheduleBox = createMenuItemBox("Schedule", "View upcoming classes");
-        HBox messagesBox = createMenuItemBox("Messages", "Communicate with instructors");
-
-        Label recentActivityLabel = new Label("Recent Activity");
-        recentActivityLabel.setFont(Font.font("Roboto", FontWeight.BOLD, 16));
+        Button helpButton = new Button("Help");
+        helpButton.setMaxWidth(500);   
+    	helpButton.setMinHeight(50);
+    	
+    	Button articleButton = new Button("Article Management");
+    	articleButton.setMaxWidth(500);   
+    	articleButton.setMinHeight(50);
+    	
+        articleButton.setOnAction(e -> {
+            articleManagement articleItem = new articleManagement();
+            primaryStage.setScene(articleItem.getScene(primaryStage, "Student", username));
+        });
         
-        VBox activityList = new VBox(10);
-        activityList.setPadding(new Insets(50));
-        activityList.setStyle("-fx-background-color: white; -fx-border-color: #e0e0e0; -fx-border-radius: 5;");
-        
-        mainContent.getChildren().addAll(coursesBox, scheduleBox, messagesBox, recentActivityLabel, activityList);
+        // Box layout
+        mainContent.setAlignment(Pos.TOP_CENTER);
+        mainContent.getChildren().addAll(helpButton, articleButton);
 
         VBox contentBox = new VBox();
         contentBox.getChildren().addAll(header, mainContent);
@@ -65,25 +68,6 @@ public class UserHomePage {
         });
         
         return new Scene(contentBox, 800, 600);
-    }
-    
-    // Helper method to create a box for each menu item
-    private HBox createMenuItemBox(String title, String description) {
-        VBox textBox = new VBox(5);
-        Label titleLabel = new Label(title);
-        titleLabel.setFont(Font.font("Roboto", FontWeight.BOLD, 14));
-        Label descLabel = new Label(description);
-        descLabel.setStyle("-fx-text-fill: #666666;");
-        textBox.getChildren().addAll(titleLabel, descLabel);
-        
-        // Horizontal layout for the meny item box with padding and border styling
-        HBox box = new HBox(15);
-        box.setAlignment(Pos.CENTER_LEFT);
-        box.getChildren().addAll(textBox);
-        box.setPadding(new Insets(15));
-        box.setStyle("-fx-background-color: white; -fx-border-color: #e0e0e0; -fx-border-radius: 5;");
-
-        return box;
     }
     
     private String getPrefName(String username) throws SQLException {

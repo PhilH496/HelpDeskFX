@@ -1,6 +1,7 @@
 package application;
 
 import java.sql.SQLException;
+import java.util.Optional;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
@@ -8,6 +9,7 @@ import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
+import javafx.scene.control.TextInputDialog;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
@@ -21,12 +23,12 @@ import javafx.stage.Stage;
  */
 
 public class listAllArticles {
-    private static articleDatabaseHelper articleDHelper;
+    private static articleDatabaseHelper articleDBelper;
 
     public Scene getScene(Stage primaryStage, String userRole, String userName) {
-        articleDHelper = new articleDatabaseHelper();
+        articleDBelper = new articleDatabaseHelper();
         try { 
-            articleDHelper.connectToDatabase(); 
+            articleDBelper.connectToDatabase(); 
             System.out.println("Welcome to article management!"); 
         } catch (SQLException e) {
             System.err.println("Database error: " + e.getMessage()); 
@@ -55,6 +57,12 @@ public class listAllArticles {
         levelComboBox.setPromptText("Display Skill Level");   
 
         Button searchButton = new Button("Search");
+       
+        Button viewButton = new Button ("View Article");
+        
+        HBox searchBox = new HBox(10, searchField, levelComboBox, searchButton, viewButton);
+        searchBox.setAlignment(Pos.CENTER);
+        
         searchButton.setOnAction(e -> {
             String keyword = searchField.getText().trim();
             String skillLevel = levelComboBox.getValue();
@@ -66,9 +74,9 @@ public class listAllArticles {
             
         });
         
-        HBox searchBox = new HBox(10, searchField, levelComboBox, searchButton);
-        searchBox.setAlignment(Pos.CENTER);
-
+        viewButton.setOnAction(e -> {
+        	viewArticle(articlesArea);
+        });
         // Back/return button to main adminpage
         Button backButton = new Button("Return");
         backButton.setMaxWidth(250);
@@ -89,10 +97,10 @@ public class listAllArticles {
         try {
             String articles;
             if (keyword == null || keyword.isEmpty() && (skillLevel == null || skillLevel.isEmpty())) {
-                articles = articleDHelper.displayArticles(userRole); // Display all if no keyword is provided
+                articles = articleDBelper.displayArticles(userRole); // Display all if no keyword is provided
             } 
             else {
-                articles = articleDHelper.searchByKeywordAndLevel(keyword, skillLevel); // Search by keyword/level
+                articles = articleDBelper.searchByKeywordAndLevel(keyword, skillLevel); // Search by keyword/level
                 if (articles.isEmpty())
                 {
                 	articles = "No articles Found!";
@@ -103,5 +111,20 @@ public class listAllArticles {
             e.printStackTrace();
             articlesArea.setText("Error");
         }
+    }
+    private void viewArticle(TextArea articlesArea) {
+    	TextInputDialog sequenceNumberInput = new TextInputDialog();
+    	sequenceNumberInput.setHeaderText("Enter the sequence number of the article you want to view: ");
+        Optional<String> sequenceOut = sequenceNumberInput.showAndWait();
+        sequenceOut.ifPresent(input -> {
+        	int sequenceNumber = Integer.parseInt(input);
+        	try {
+        		String article = articleDBelper.viewArticle(sequenceNumber);
+        		articlesArea.setText(article);
+			} catch (SQLException e) {
+				e.printStackTrace();
+				articlesArea.setText("Error");
+			}
+    	});
     }
 }
