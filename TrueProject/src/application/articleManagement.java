@@ -171,7 +171,7 @@ public class articleManagement {
             try {
             	articleDHelper.articleCreation(groupTypeComboBox.getValue(), levelComboBox.getValue(), groupsComboBox.getValue(), titleField.getText(), 
                 		authorField.getText(), abstractArea.getText(), keywordsField.getText(), 
-                		bodyArea.getText(), referencesArea.getText());
+                		bodyArea.getText(), referencesArea.getText(), false, -1);
                 primaryStage.setScene(getScene(primaryStage, userRole, userName)); // Return to main scene after creating article
             } catch (Exception ex) {
                 ex.printStackTrace();

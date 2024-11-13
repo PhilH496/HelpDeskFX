@@ -4,7 +4,9 @@ import java.sql.SQLException;
 import java.util.Optional;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
@@ -24,7 +26,8 @@ import javafx.stage.Stage;
 
 public class listAllArticles {
     private static articleDatabaseHelper articleDBelper;
-
+    private static int sequenceNumber = -1;
+    
     public Scene getScene(Stage primaryStage, String userRole, String userName) {
         articleDBelper = new articleDatabaseHelper();
         try { 
@@ -57,10 +60,11 @@ public class listAllArticles {
         levelComboBox.setPromptText("Display Skill Level");   
 
         Button searchButton = new Button("Search");
-       
-        Button viewButton = new Button ("View Article");
+        Button viewButton = new Button("View Article");
+        Button editButton = new Button("Edit");
+        editButton.setVisible(false);
         
-        HBox searchBox = new HBox(10, searchField, levelComboBox, searchButton, viewButton);
+        HBox searchBox = new HBox(10, searchField, levelComboBox, searchButton, viewButton, editButton);
         searchBox.setAlignment(Pos.CENTER);
         
         searchButton.setOnAction(e -> {
@@ -69,14 +73,24 @@ public class listAllArticles {
             if (skillLevel == null || skillLevel.equals("Display Skill Level") || skillLevel.equals("All")) {
                 skillLevel = null;
             }
-            
             displayArticles(articlesArea, keyword, skillLevel, userRole);
-            
+            editButton.setVisible(false);
         });
         
         viewButton.setOnAction(e -> {
-        	viewArticle(articlesArea);
+        	sequenceNumber = viewArticle(articlesArea);
+        	System.out.print(sequenceNumber);
+        	editButton.setVisible(true);
         });
+        
+        editButton.setOnAction(e -> {
+        	try {
+				editArticle(primaryStage, userRole, userName, sequenceNumber);
+			} catch (Exception e1) {
+				e1.printStackTrace();
+			}
+        });
+        
         // Back/return button to main adminpage
         Button backButton = new Button("Return");
         backButton.setMaxWidth(250);
@@ -90,7 +104,7 @@ public class listAllArticles {
         return new Scene(cb, 600, 600);
     }
 
-    /* Method to display articles based on a keyword search. This part will call upon 
+	/* Method to display articles based on a keyword search. This part will call upon 
      * articleDatabaseHelper and query via keyword 
      */
     private void displayArticles(TextArea articlesArea, String keyword, String skillLevel, String userRole) {
@@ -112,19 +126,124 @@ public class listAllArticles {
             articlesArea.setText("Error");
         }
     }
-    private void viewArticle(TextArea articlesArea) {
-    	TextInputDialog sequenceNumberInput = new TextInputDialog();
-    	sequenceNumberInput.setHeaderText("Enter the sequence number of the article you want to view: ");
+    
+    private int viewArticle(TextArea articlesArea) {
+        TextInputDialog sequenceNumberInput = new TextInputDialog();
+        sequenceNumberInput.setHeaderText("Enter the sequence number of the article you want to view: ");
         Optional<String> sequenceOut = sequenceNumberInput.showAndWait();
-        sequenceOut.ifPresent(input -> {
-        	int sequenceNumber = Integer.parseInt(input);
-        	try {
-        		String article = articleDBelper.viewArticle(sequenceNumber);
-        		articlesArea.setText(article);
-			} catch (SQLException e) {
-				e.printStackTrace();
-				articlesArea.setText("Error");
-			}
-    	});
+        
+        if (sequenceOut.isPresent()) {
+            int sequenceNumber = Integer.parseInt(sequenceOut.get());
+            try {
+                String article = articleDBelper.viewArticle(sequenceNumber);
+                articlesArea.setText(article);
+                return sequenceNumber;
+            } catch (SQLException e) {
+                e.printStackTrace();
+                articlesArea.setText("Error");
+                return -1;
+            }
+        }
+        return -1; // Return -1 if no input was provided
     }
+    
+    private void editArticle(Stage primaryStage, String userRole, String userName, int sequenceNumber) throws Exception {
+    	String article[] = articleDBelper.updateArticle(sequenceNumber); 
+    	
+    	VBox createBox = new VBox(10);
+        createBox.setAlignment(Pos.CENTER);
+        
+        TextField titleField = new TextField();
+        titleField.setText(article[3]);
+        titleField.setPromptText("Title");
+        
+        TextField authorField = new TextField();
+        authorField.setText(article[4]);
+        authorField.setPromptText("Author(s)");
+        
+        TextArea abstractArea = new TextArea();
+        abstractArea.setText(article[5]);
+        abstractArea.setPromptText("Abstract");
+        
+        TextField keywordsField = new TextField();
+        keywordsField.setText(article[6]);
+        keywordsField.setPromptText("Set of keywords");
+        
+        TextArea bodyArea = new TextArea();
+        bodyArea.setText(article[7]);
+        bodyArea.setPromptText("Body");
+
+        TextArea referencesArea = new TextArea();
+        referencesArea.setText(article[8]);
+        referencesArea.setPromptText("Set of references");
+        
+        ComboBox<String> levelComboBox = new ComboBox<>();
+        levelComboBox.getItems().addAll("Beginner", "Intermediate", "Advanced", "Expert");
+        levelComboBox.setValue(article[1]);
+        
+        
+        ComboBox<String> groupsComboBox = new ComboBox<>();
+        groupsComboBox.getItems().addAll("H2 Database", "SQL Fiddle",
+        		"IntelliJ", "Eclipse");
+        groupsComboBox.setPromptText("Select Group");
+        groupsComboBox.setValue(article[2]);
+        
+        ComboBox<String> groupTypeComboBox = new ComboBox<>();
+        groupTypeComboBox.getItems().addAll("General Group", "Special Group");
+        groupTypeComboBox.setPromptText("Select Group Type");   
+        groupTypeComboBox.setValue(article[0]);
+        
+        groupTypeComboBox.setOnAction(event -> {
+            String selectedGroup = groupTypeComboBox.getValue();
+
+            if ("Special Group".equals(selectedGroup)) {
+                // Show input dialog to enter the name for "Special Group"
+                TextInputDialog dialog = new TextInputDialog();
+                dialog.setTitle("Special Group Name");
+                dialog.setHeaderText("Enter a name for the Special Group:");
+                dialog.setContentText("Group Name:");
+
+                // Get the entered name
+                dialog.showAndWait().ifPresent(name -> {
+                    if (!name.isEmpty()) {
+                        // Optionally add the new name to the ComboBox or perform other actions
+                        groupTypeComboBox.getItems().add(name);
+                        groupTypeComboBox.setValue(name); // Select the new group name
+                    } else {
+                        // Alert if no name was entered
+                        Alert alert = new Alert(Alert.AlertType.WARNING, "Please enter a valid group name.", ButtonType.OK);
+                        alert.showAndWait();
+                        groupTypeComboBox.setValue(null); // Reset selection
+                    }
+                });
+            }
+        });
+        
+        HBox horizontalLayoutForButtons = new HBox(5, levelComboBox, groupsComboBox, groupTypeComboBox);
+        horizontalLayoutForButtons.setAlignment(Pos.CENTER);
+        
+        Button submitButton = new Button("Submit");
+        submitButton.setMaxWidth(250);   
+        submitButton.setMinHeight(25);
+        submitButton.setOnAction(e -> {
+            try {
+            	articleDBelper.articleCreation(groupTypeComboBox.getValue(), levelComboBox.getValue(), groupsComboBox.getValue(), titleField.getText(), 
+                		authorField.getText(), abstractArea.getText(), keywordsField.getText(), 
+                		bodyArea.getText(), referencesArea.getText(), true, sequenceNumber);
+                primaryStage.setScene(getScene(primaryStage, userRole, userName)); // Return to main scene after creating article
+            } catch (Exception ex) {
+                ex.printStackTrace();
+            }
+        });
+        Button backButton = new Button("Back");
+        backButton.setMaxWidth(250);   
+        backButton.setMinHeight(25);
+        backButton.setOnAction(e -> primaryStage.setScene(getScene(primaryStage, userRole, userName)));
+        
+        createBox.getChildren().addAll(titleField, authorField, abstractArea, 
+        		keywordsField, bodyArea, referencesArea, horizontalLayoutForButtons, submitButton, backButton);
+
+        primaryStage.setScene(new Scene(createBox, 600, 600));
+		
+	}
 }

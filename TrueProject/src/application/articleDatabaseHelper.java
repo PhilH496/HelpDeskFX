@@ -338,9 +338,18 @@ class articleDatabaseHelper {
 	 *  abstract, keywords, body, and references and add it to the database.
 	 */
 	public void articleCreation(String groupType, String level, String group, String title, String author, 
-			String abstracts, String keywords, String body, String references) {
-		String insertArticle = "INSERT INTO cse360article (groupType, level, article_group, title, author, abstract, keywords, body, references) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
-		try (PreparedStatement pstmt = connection.prepareStatement(insertArticle)) {
+			String abstracts, String keywords, String body, String references, boolean update, int id) {
+		String sql;
+		if (update == true) {
+			sql = "UPDATE cse360article SET groupType = ?, level = ?, article_group = ?, title = ?, " +
+		              "author = ?, abstract = ?, keywords = ?, body = ?, references = ? " +
+		              "WHERE id = " + "'" + id + "'";
+		} else {
+			sql = "INSERT INTO cse360article (groupType, level, article_group, title, author, abstract, keywords, body, references) "
+					+ "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
+		}
+		
+		try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
 			pstmt.setString(1, groupType);
 			pstmt.setString(2, level);
 			pstmt.setString(3, group);
@@ -415,6 +424,36 @@ class articleDatabaseHelper {
 		} catch(SQLException se){ 
 			se.printStackTrace(); 
 		} 
+	}
+	
+	public String[] updateArticle(int sequenceNumber) throws Exception {
+	    String sql = "SELECT * FROM cse360article WHERE id = " + "'" + sequenceNumber + "'";
+	    String article[] = new String[9];
+	    
+		Statement stmt = connection.createStatement();
+		ResultSet rs = stmt.executeQuery(sql); 
+		while(rs.next()) { 
+			String groupType = rs.getString("groupType");
+			String level = rs.getString("level");
+			String group = rs.getString("article_group");
+			String title = rs.getString("title");
+			String author = rs.getString("author");
+			String abstracts = rs.getString("abstract");
+			String keywords = rs.getString("keywords");
+			String body = rs.getString("body");
+			String references = rs.getString("references");
+			
+			article[0] = groupType;
+			article[1] = level;
+			article[2] = group;
+			article[3] = title;
+			article[4] = author;
+			article[5] = abstracts;
+			article[6] = keywords;
+			article[7] = body;
+			article[8] = references;			
+		}
+		return article;
 	}
 
 }
