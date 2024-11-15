@@ -78,9 +78,35 @@ public class listAllArticles {
         });
         
         viewButton.setOnAction(e -> {
-        	sequenceNumber = viewArticle(articlesArea);
+        	sequenceNumber = viewArticle(articlesArea, userName);
         	System.out.print(sequenceNumber);
-        	editButton.setVisible(true);
+        	DatabaseHelper dbHelper = new DatabaseHelper();
+        	try {
+				dbHelper.connectToDatabase();
+			} catch (SQLException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+        	try {
+	        	String userSpecialGroup = dbHelper.getSpecialAccessGroup(userName);
+	        	if ((!userRole.equals("Student")) && ((userSpecialGroup.equals(articleDBelper.getGroupType(sequenceNumber)) ||
+	        			dbHelper.isGroupInAdminRights(userName, articleDBelper.getGroupType(sequenceNumber)))))
+	        	{
+	        		editButton.setVisible(true);
+	        	}
+	        	else if (articleDBelper.getGroupType(sequenceNumber).equals("General Group") && (!userRole.equals("Student")))
+	        	{
+        			editButton.setVisible(true);
+	        	}
+	        	else
+	        	{
+	        		editButton.setVisible(false);
+	        	}
+			} catch (SQLException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+        	
         });
         
         editButton.setOnAction(e -> {
@@ -96,8 +122,20 @@ public class listAllArticles {
         backButton.setMaxWidth(250);
         backButton.setMinHeight(25);
         backButton.setOnAction(e -> {
-            articleManagement back = new articleManagement();
-            primaryStage.setScene(back.getScene(primaryStage, userRole, userName));
+        	if (!userRole.equals("Student"))
+        	{
+        		articleManagement back = new articleManagement();
+        		primaryStage.setScene(back.getScene(primaryStage, userRole, userName));
+        	}
+        	else {
+            	UserHomePage backHome = new UserHomePage();
+            	try {
+					primaryStage.setScene(backHome.getScene(primaryStage, userName));
+				} catch (SQLException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
+            }
         });
         cb.getChildren().addAll(titleLabel, searchBox, articlesArea, backButton);
 
@@ -127,7 +165,7 @@ public class listAllArticles {
         }
     }
     
-    private int viewArticle(TextArea articlesArea) {
+    private int viewArticle(TextArea articlesArea, String userName) {
         TextInputDialog sequenceNumberInput = new TextInputDialog();
         sequenceNumberInput.setHeaderText("Enter the sequence number of the article you want to view: ");
         Optional<String> sequenceOut = sequenceNumberInput.showAndWait();
@@ -135,7 +173,7 @@ public class listAllArticles {
         if (sequenceOut.isPresent()) {
             int sequenceNumber = Integer.parseInt(sequenceOut.get());
             try {
-                String article = articleDBelper.viewArticle(sequenceNumber);
+                String article = articleDBelper.viewArticle(sequenceNumber, userName);
                 articlesArea.setText(article);
                 return sequenceNumber;
             } catch (SQLException e) {

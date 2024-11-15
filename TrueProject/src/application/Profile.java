@@ -76,7 +76,7 @@ public class Profile {
         
         adminPage.setOnAction(e -> {
              AdminHomePage adminHome = new AdminHomePage();
-            primaryStage.setScene(adminHome.getScene(primaryStage));
+            primaryStage.setScene(adminHome.getScene(primaryStage, username));
         });
         
         Button teacherPage = new Button("Finish Setting Up Profile (Instructor)");

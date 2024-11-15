@@ -191,7 +191,7 @@ class articleDatabaseHelper {
 	 * Besides the title, author, and id number, everything else will be encrypted and only decrypted when called upon. This
 	 * feature will be added later on.
 	 */
-	public String viewArticle(int sequenceNumber) throws SQLException {
+	public String viewArticle(int sequenceNumber, String userName) throws SQLException {
 		String findUserQuery = "SELECT * FROM cse360article WHERE id = ?";
 		StringBuilder article = new StringBuilder();
 	    try (PreparedStatement stmt = connection.prepareStatement(findUserQuery)) {
@@ -199,6 +199,7 @@ class articleDatabaseHelper {
             ResultSet rs = stmt.executeQuery();
             while (rs.next()) {
             	int id = rs.getInt("id");
+            	String groupType = rs.getString("groupType");
     	        String level = rs.getString("level");
     	        String group = rs.getString("article_group");
     	        String title = rs.getString("title");
@@ -207,7 +208,42 @@ class articleDatabaseHelper {
     	        String keywords = rs.getString("keywords");
     	        String body = rs.getString("body");
     	        String references = rs.getString("references");
-
+                DatabaseHelper databaseHelp = new DatabaseHelper();
+                databaseHelp.connectToDatabase();
+                String userGroupType = databaseHelp.getSpecialAccessGroup(userName);
+    	        if (!groupType.equals("General Group")) // if this is a special group
+    	        {
+    	        	if ((userGroupType != null && groupType.equals(userGroupType)) || 
+    	        			(userGroupType != null && databaseHelp.isGroupInViewingRights(userName, groupType)) ||
+    	        			(userGroupType == null && databaseHelp.isGroupInViewingRights(userName, groupType))) //if special group name == user's group
+    	        		{
+    	        			article.append("Sequence Number: ").append(id).append("\n")
+    	        			.append("Level: ").append(level).append("\n")
+	        				.append("Group: ").append(group).append("\n")
+	        				.append("Title: ").append(title).append("\n")
+	        				.append("Author: ").append(author).append("\n")
+	        				.append("Abstract: ").append(abstracts).append("\n")
+	        				.append("Keyword(s): ").append(keywords).append("\n")
+	        				.append("Body: ").append(body).append("\n")
+	        				.append("Reference(s): ").append(references).append("\n")
+	        				.append("-------------\n");
+    	        		}
+    	        	else // if special group != what the user special group is
+    	        	{
+	        			article.append("Sequence Number: ").append(id).append("\n")
+	        			.append("Level: ").append(level).append("\n")
+        				.append("Group: ").append(group).append("\n")
+        				.append("Title: ").append(title).append("\n")
+        				.append("Author: ").append(author).append("\n")
+        				.append("Abstract: ").append(abstracts).append("\n")
+        				.append("Keyword(s): ").append(keywords).append("\n")
+        				.append("Body: [HIDDEN]").append("\n")
+        				.append("Reference(s): [HIDDEN]").append("\n")
+        				.append("-------------\n");	
+    	        	}
+    	        }
+    	        else
+    	        {
     	        article.append("Sequence Number: ").append(id).append("\n")
     	        		.append("Level: ").append(level).append("\n")
     	        		.append("Group: ").append(group).append("\n")
@@ -218,6 +254,7 @@ class articleDatabaseHelper {
     	                .append("Body: ").append(body).append("\n")
     	                .append("Reference(s): ").append(references).append("\n")
     	                .append("-------------\n");
+    	        }
             }
         }
 	    return article.toString();
@@ -454,6 +491,23 @@ class articleDatabaseHelper {
 			article[8] = references;			
 		}
 		return article;
+	}
+	
+	public String getGroupType(int articleId) throws SQLException {
+	    String groupType = null;
+	    String sql = "SELECT groupType FROM cse360article WHERE id = ?";
+
+	    try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
+	        pstmt.setInt(1, articleId);
+	        ResultSet rs = pstmt.executeQuery();
+
+	        if (rs.next()) {
+	            groupType = rs.getString("groupType");
+	        }
+	    } catch (SQLException e) {
+	        System.out.println("Error retrieving groupType: " + e.getMessage());
+	    }
+	    return groupType;
 	}
 
 }

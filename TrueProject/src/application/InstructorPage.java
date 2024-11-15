@@ -164,6 +164,7 @@ public class InstructorPage {
   	            try {
   	                databaseHelper.connectToDatabase();
   	                databaseHelper.register(email, password, "Student");
+  	                databaseHelper.updateSpecialGroup("General Group", email);
   	                databaseHelper.closeConnection();
   	                Label successLabel = new Label("Student succesfully invited");
   	                successLabel.setTextFill(Color.GREEN);

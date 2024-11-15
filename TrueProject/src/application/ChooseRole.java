@@ -35,7 +35,7 @@ public class ChooseRole {
 	    	//Functional buttons when clicked to redirect to specific home pages.
 	        admin.setOnAction(e -> {
 	            AdminHomePage adminPage = new AdminHomePage();
-	            primaryStage.setScene(adminPage.getScene(primaryStage));
+	            primaryStage.setScene(adminPage.getScene(primaryStage, username));
 	        });
 		 
 	        instructor.setOnAction(e -> {

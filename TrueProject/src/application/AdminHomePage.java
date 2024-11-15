@@ -41,7 +41,7 @@ import javafx.scene.control.ButtonType;
 public class AdminHomePage {
 	private static final DatabaseHelper databaseHelper = new DatabaseHelper();
 	// Method to create and return the UI for the admin homepage
-    public Scene getScene(Stage primaryStage) {
+    public Scene getScene(Stage primaryStage, String name) {
         Label titleLabel = new Label("Admin Home Page");
         titleLabel.setFont(Font.font("Roboto", FontWeight.BOLD, 20));
         String prefName = "Admin";
@@ -89,7 +89,7 @@ public class AdminHomePage {
     	});
     	
         listUsers.setOnAction(e -> {
-        	displayUsers(primaryStage);
+        	displayUsers(primaryStage, name);
         });
         
         deleteUser.setOnAction(e -> {
@@ -102,12 +102,12 @@ public class AdminHomePage {
        
         passReset.setOnAction(e -> {
             PassReset pass = new PassReset();
-            primaryStage.setScene(pass.getScene(primaryStage));
+            primaryStage.setScene(pass.getScene(primaryStage, name));
         });
 
         articleButton.setOnAction(e -> {
             articleManagement articleItem = new articleManagement();
-            primaryStage.setScene(articleItem.getScene(primaryStage, "Admin", null));
+            primaryStage.setScene(articleItem.getScene(primaryStage, "Admin", name));
         });
         
         loggingOut.setOnAction(e -> {
@@ -161,7 +161,7 @@ public class AdminHomePage {
     }
     
     // Method to display all users in a TableView object
-    private static void displayUsers(Stage primaryStage) {
+    private static void displayUsers(Stage primaryStage, String name) {
     	try {
     		databaseHelper.connectToDatabase();  
             List<User> users = databaseHelper.getAllUsers("None");
@@ -183,7 +183,7 @@ public class AdminHomePage {
 	        backButton.setPrefWidth(400);
 	        backButton.setOnAction(event -> {
 	            AdminHomePage adminPage = new AdminHomePage();
-	        	primaryStage.setScene(adminPage.getScene(primaryStage));
+	        	primaryStage.setScene(adminPage.getScene(primaryStage, name));
 	        });
 
 	        VBox vbox = new VBox(table, backButton);
@@ -222,6 +222,7 @@ public class AdminHomePage {
   	            try {
   	                databaseHelper.connectToDatabase();
   	                databaseHelper.register(email, password, role);
+  	                databaseHelper.updateSpecialGroup("General Group", email);
   	                databaseHelper.closeConnection();
   	                Label successLabel = new Label("User succesfully invited");
   	                successLabel.setTextFill(Color.GREEN);

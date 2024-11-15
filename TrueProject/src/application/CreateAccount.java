@@ -23,6 +23,10 @@ public class CreateAccount {
                
               db.register(username, gettingPass, role);
               System.out.println("Registering " + username + "....");
+              if (role.equals("Student"))
+              {
+            	  db.updateSpecialGroup("General Group", username);
+              }
            } catch (SQLException ex) {
                ex.printStackTrace(); 
            } finally {
@@ -150,6 +154,9 @@ public class CreateAccount {
         		accountSetter(name, confirm, roleType);
         		login loginScene = new login();
         		primaryStage.setScene(loginScene.getScene(primaryStage));
+        		
+        		
+        		
         	}
         });
       

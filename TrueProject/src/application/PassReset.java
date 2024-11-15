@@ -28,7 +28,7 @@ public class PassReset {
 	static final String DB_URL = "jdbc:h2:~/firstDatabase";  
 	private static final DatabaseHelper databaseHelper = new DatabaseHelper();
 	// Method to create and return the UI for the password reset page
-    public Scene getScene(Stage primaryStage) {
+    public Scene getScene(Stage primaryStage, String userName) {
     	Label titleLabel = new Label("Reset User Password");
         titleLabel.setFont(Font.font("Roboto", FontWeight.BOLD, 24));
         
@@ -60,7 +60,7 @@ public class PassReset {
         
         returnAdmin.setOnAction(e -> {
         	AdminHomePage adminPage = new AdminHomePage();
-        	primaryStage.setScene(adminPage.getScene(primaryStage));
+        	primaryStage.setScene(adminPage.getScene(primaryStage, userName));
         });
 
         return new Scene(contentBox, 600, 400);
