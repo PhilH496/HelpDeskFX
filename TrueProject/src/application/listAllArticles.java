@@ -29,7 +29,12 @@ public class listAllArticles {
     private static int sequenceNumber = -1;
     
     public Scene getScene(Stage primaryStage, String userRole, String userName) {
-        articleDBelper = new articleDatabaseHelper();
+        try {
+			articleDBelper = new articleDatabaseHelper();
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
         try { 
             articleDBelper.connectToDatabase(); 
             System.out.println("Welcome to article management!"); 
@@ -78,7 +83,12 @@ public class listAllArticles {
         });
         
         viewButton.setOnAction(e -> {
-        	sequenceNumber = viewArticle(articlesArea, userName);
+        	try {
+				sequenceNumber = viewArticle(articlesArea, userName);
+			} catch (Exception e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
         	System.out.print(sequenceNumber);
         	DatabaseHelper dbHelper = new DatabaseHelper();
         	try {
@@ -165,7 +175,7 @@ public class listAllArticles {
         }
     }
     
-    private int viewArticle(TextArea articlesArea, String userName) {
+    private int viewArticle(TextArea articlesArea, String userName) throws Exception {
         TextInputDialog sequenceNumberInput = new TextInputDialog();
         sequenceNumberInput.setHeaderText("Enter the sequence number of the article you want to view: ");
         Optional<String> sequenceOut = sequenceNumberInput.showAndWait();

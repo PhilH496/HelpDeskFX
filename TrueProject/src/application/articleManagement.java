@@ -29,7 +29,12 @@ public class articleManagement {
 	private VBox contentBox;
 
     public Scene getScene(Stage primaryStage, String userRole, String userName) {
-    	articleDHelper = new articleDatabaseHelper();
+    	try {
+			articleDHelper = new articleDatabaseHelper();
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
     	
     	try { 
 			articleDHelper.connectToDatabase(); 

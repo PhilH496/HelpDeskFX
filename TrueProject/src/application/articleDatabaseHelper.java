@@ -2,6 +2,9 @@ package application;
 import java.sql.*;
 import java.util.Base64;
 
+import Encryption.EncryptionHelper;
+import Encryption.EncryptionUtils;
+
 import java.io.*;
 /*
  * This portion creates the main database functionalities of when called upon in the main.
@@ -18,6 +21,12 @@ class articleDatabaseHelper {
 
 	private Connection connection = null;
 	private Statement statement = null; 
+	
+	private EncryptionHelper encryptionHelper;
+	
+	public articleDatabaseHelper() throws Exception {
+		encryptionHelper = new EncryptionHelper();
+	}
 	
 	public void connectToDatabase() throws SQLException {
 		try {
@@ -191,7 +200,7 @@ class articleDatabaseHelper {
 	 * Besides the title, author, and id number, everything else will be encrypted and only decrypted when called upon. This
 	 * feature will be added later on.
 	 */
-	public String viewArticle(int sequenceNumber, String userName) throws SQLException {
+	public String viewArticle(int sequenceNumber, String userName) throws Exception {
 		String findUserQuery = "SELECT * FROM cse360article WHERE id = ?";
 		StringBuilder article = new StringBuilder();
 	    try (PreparedStatement stmt = connection.prepareStatement(findUserQuery)) {
@@ -208,6 +217,25 @@ class articleDatabaseHelper {
     	        String keywords = rs.getString("keywords");
     	        String body = rs.getString("body");
     	        String references = rs.getString("references");
+    	        
+    	        String encryptedBody = Base64.getEncoder().encodeToString(
+    		            encryptionHelper.encrypt(body.getBytes(), EncryptionUtils.getInitializationVector(author.toCharArray()))
+    		        );
+
+    		    String encryptedReferences = Base64.getEncoder().encodeToString(
+    		            encryptionHelper.encrypt(references.getBytes(), EncryptionUtils.getInitializationVector(author.toCharArray()))
+    		        );
+
+    		        String decryptedBody = new String(encryptionHelper.decrypt(
+    		            Base64.getDecoder().decode(encryptedBody), 
+    		            EncryptionUtils.getInitializationVector(author.toCharArray())
+    		        ));
+    		
+    		        String decryptedReferences = new String(encryptionHelper.decrypt(
+    		            Base64.getDecoder().decode(encryptedReferences), 
+    		            EncryptionUtils.getInitializationVector(author.toCharArray())
+    		        ));      
+    	        
                 DatabaseHelper databaseHelp = new DatabaseHelper();
                 databaseHelp.connectToDatabase();
                 String userGroupType = databaseHelp.getSpecialAccessGroup(userName);
@@ -224,8 +252,8 @@ class articleDatabaseHelper {
 	        				.append("Author: ").append(author).append("\n")
 	        				.append("Abstract: ").append(abstracts).append("\n")
 	        				.append("Keyword(s): ").append(keywords).append("\n")
-	        				.append("Body: ").append(body).append("\n")
-	        				.append("Reference(s): ").append(references).append("\n")
+	        				.append("Body: ").append(decryptedBody).append("\n")
+	        				.append("Reference(s): ").append(decryptedReferences).append("\n")
 	        				.append("-------------\n");
     	        		}
     	        	else // if special group != what the user special group is
@@ -237,8 +265,8 @@ class articleDatabaseHelper {
         				.append("Author: ").append(author).append("\n")
         				.append("Abstract: ").append(abstracts).append("\n")
         				.append("Keyword(s): ").append(keywords).append("\n")
-        				.append("Body: [HIDDEN]").append("\n")
-        				.append("Reference(s): [HIDDEN]").append("\n")
+        				.append("Body: ").append(encryptedBody).append("\n")
+        				.append("Reference(s): ").append(encryptedReferences).append("\n")
         				.append("-------------\n");	
     	        	}
     	        }
@@ -251,8 +279,8 @@ class articleDatabaseHelper {
     	                .append("Author: ").append(author).append("\n")
     	                .append("Abstract: ").append(abstracts).append("\n")
     	                .append("Keyword(s): ").append(keywords).append("\n")
-    	                .append("Body: ").append(body).append("\n")
-    	                .append("Reference(s): ").append(references).append("\n")
+    	                .append("Body: ").append(decryptedBody).append("\n")
+    	                .append("Reference(s): ").append(decryptedReferences).append("\n")
     	                .append("-------------\n");
     	        }
             }
@@ -277,8 +305,8 @@ class articleDatabaseHelper {
 	        String author = rs.getString("author");
 	        String abstracts = rs.getString("abstract");
 	        String keywords = rs.getString("keywords");
-	        //String body = rs.getString("body");
-	        //String references = rs.getString("references");
+	        String body = rs.getString("body");
+	        String references = rs.getString("references");
 	        
 
 	        // Append article details to the StringBuilder
@@ -302,53 +330,6 @@ class articleDatabaseHelper {
 	        }
 			*/
 	        //articles.append("-------------\n");
-	        
-	  /*
-	   * This part will encrypt all the fields we want encrypted
-	        String encryptedAbstract = Base64.getEncoder().encodeToString(
-	            encryptionHelper.encrypt(abstracts.getBytes(), EncryptionUtils.getInitializationVector(author.toCharArray()))
-	        );
-
-	        String encryptedKeywords = Base64.getEncoder().encodeToString(
-	            encryptionHelper.encrypt(keywords.getBytes(), EncryptionUtils.getInitializationVector(author.toCharArray()))
-	        );
-
-	        String encryptedBody = Base64.getEncoder().encodeToString(
-	            encryptionHelper.encrypt(body.getBytes(), EncryptionUtils.getInitializationVector(author.toCharArray()))
-	        );
-
-	        String encryptedReferences = Base64.getEncoder().encodeToString(
-	            encryptionHelper.encrypt(references.getBytes(), EncryptionUtils.getInitializationVector(author.toCharArray()))
-	        );
-
-	   * 
-	   * This part will decrypt everything	        
-	         String decryptedAbstract = new String(encryptionHelper.decrypt(
-            Base64.getDecoder().decode(encryptedAbstract), 
-            EncryptionUtils.getInitializationVector(author.toCharArray())
-        ));
-
-        String decryptedKeywords = new String(encryptionHelper.decrypt(
-            Base64.getDecoder().decode(encryptedKeywords), 
-            EncryptionUtils.getInitializationVector(author.toCharArray())
-        ));
-
-        String decryptedBody = new String(encryptionHelper.decrypt(
-            Base64.getDecoder().decode(encryptedBody), 
-            EncryptionUtils.getInitializationVector(author.toCharArray())
-        ));
-
-        String decryptedReferences = new String(encryptionHelper.decrypt(
-            Base64.getDecoder().decode(encryptedReferences), 
-            EncryptionUtils.getInitializationVector(author.toCharArray())
-        )); */
-	        
-	        
-	       // System.out.println("Abstract: " + decryptedAbstract);
-	       // System.out.println("Keywords: " + decryptedKeywords);
-	       // System.out.println("Body: " + decryptedBody);
-	       // System.out.println("References: " + decryptedReferences);
-	       // System.out.println("-------------");	        
 	        
 	       count++;
 	    }
