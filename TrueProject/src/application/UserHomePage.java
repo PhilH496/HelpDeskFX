@@ -81,6 +81,7 @@ public class UserHomePage {
         return new Scene(contentBox, 800, 600);
     }
     
+    // Private method to get the preferred name of the user to display on their homepage
     private String getPrefName(String username) throws SQLException {
         DatabaseHelper db = new DatabaseHelper();
         db.connectToDatabase();
@@ -89,30 +90,29 @@ public class UserHomePage {
         return prefName;
     }
     
+    // Private method that prompts the user to specify a message type then send a message to the help system
     private void sendMessage() {
+    	// Dialog to prompt the user to tag their message as Generic or Specific
     	List<String> messageOptions = new ArrayList<>();
     	messageOptions.add("Generic");
     	messageOptions.add("Specific");
-
-  	    ChoiceDialog<String> type = new ChoiceDialog<>("Generic", messageOptions);
-  	    type.setContentText("Select a message type:");
-
-  	    TextInputDialog messageInput = new TextInputDialog();
-  	    messageInput.setHeaderText("Enter your message:");
-
-  	    Optional<String> messageOutput = messageInput.showAndWait();
-  	    if (messageOutput.isPresent()) {							// If the email was entered
-  	        String message = messageOutput.get(); 
+  	    ChoiceDialog<String> messageTypeDialog = new ChoiceDialog<>("Generic", messageOptions);
+  	    messageTypeDialog.setContentText("Select a message type:");
+  	    
+  	    Optional<String> messageTypeResult = messageTypeDialog.showAndWait();	
+  	    if (messageTypeResult.isPresent()) {						
+  	    	String messageType = messageTypeResult.get(); 
+  	    	// Dialog to prompt the user to enter the message they wish to send to the help system
+  	    	TextInputDialog messageInputDialog = new TextInputDialog();
+  	  	    messageInputDialog.setHeaderText("Enter your message:");
   	        
-  	        Optional<String> out = type.showAndWait();	
-  	        if (out.isPresent()) {							// If the role was chosen
-  	            String messageType = out.get();
-
-  	            // Change the role of the user
-  	            System.out.print("Message posted: " + message + " as " + messageType);
+  	        Optional<String> messageInputResult = messageInputDialog.showAndWait();
+  	        if (messageInputResult.isPresent()) {						
+  	            String messageInput = messageInputResult.get();
+  	            System.out.print("Message posted: " + messageInput + " as " + messageType);
   	        } else {
-  	        	Label roleInputCanceled = new Label("Message type not selected");
-  	        	roleInputCanceled.setTextFill(Color.RED);
+  	        	Label messageInputCanceled = new Label("Message type not selected");
+  	        	messageInputCanceled.setTextFill(Color.RED);
   	        }
   	    } else {
   	    	Label usernameInputCanceled = new Label("Message input was canceled");

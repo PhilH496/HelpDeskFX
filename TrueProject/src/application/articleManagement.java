@@ -77,7 +77,13 @@ public class articleManagement {
 
         createArticleButton.setOnAction(e -> createArticle(primaryStage, userRole, userName));
         
-        deleteArticleButton.setOnAction(e -> deleteArticle(primaryStage, userRole, userName));
+        deleteArticleButton.setOnAction(e -> {
+			try {
+				deleteArticle(primaryStage, userRole, userName);
+			} catch (SQLException e1) {
+				e1.printStackTrace();
+			}
+		});
         
         backupRestoreButton.setOnAction(e -> backupRestore(primaryStage));
         
@@ -256,56 +262,53 @@ public class articleManagement {
         primaryStage.setScene(new Scene(createBox, 600, 600));
     }
     
-    // This part deletes the article and sends a confirmation on if the user really
-    // wants to delete the article. It will also confirm if the article title exists
-    private void deleteArticle(Stage primaryStage, String userRole, String userName) {
-    	TextInputDialog titleDialog = new TextInputDialog();
-        titleDialog.setTitle("Delete Article");
-        titleDialog.setHeaderText("Delete Article");
-        titleDialog.setContentText("Please enter the title of the article to delete: ");
-
-        Optional<String> result = titleDialog.showAndWait();
-
-        result.ifPresent(titleText -> {
-            try {
-                String title = result.get();
-
-                // Confirm deletion
-                Alert confirmAlert = new Alert(Alert.AlertType.CONFIRMATION);
-                confirmAlert.setTitle("Confirmation");
-                confirmAlert.setHeaderText("Are you sure you want to delete this article?");
-
-                Optional<ButtonType> confirmation = confirmAlert.showAndWait();
-
-                if (confirmation.isPresent() && confirmation.get() == ButtonType.OK) {
-                    // Delete article if confirmed
-                    articleDHelper.deleteArticle(title);
-
-                    // Show success message
-                    Alert successAlert = new Alert(Alert.AlertType.INFORMATION);
-                    successAlert.setTitle("Success");
-                    successAlert.setHeaderText("Article deleted successfully.");
-                    successAlert.showAndWait();
-
-                    // Return to the main scene
-                    primaryStage.setScene(getScene(primaryStage, userRole, userName));
-                } else {
-                    // Canceled deletion message
-                    Alert cancelAlert = new Alert(Alert.AlertType.INFORMATION);
-                    cancelAlert.setTitle("Cancellation");
-                    cancelAlert.setHeaderText("Article deletion was canceled.");
-                    cancelAlert.showAndWait();
-                }
-            } catch (NumberFormatException ex) {
-                // Handle invalid title format
-                Alert errorAlert = new Alert(Alert.AlertType.ERROR);
-                errorAlert.setTitle("Invalid Title");
-                errorAlert.setHeaderText("Please enter a valid title.");
-                errorAlert.showAndWait();
-            } catch (Exception ex) {
-                ex.printStackTrace();
-            }
-        });
+    // This method prompts the user if it wants to delete by group type or title with a Yes/No dialog
+    // If yes, the user is prompted to enter the group type of the article(s) to be deleted
+    // If no, the user is prompted to enter the title of the article to delete
+    private void deleteArticle(Stage primaryStage, String userRole, String userName) throws SQLException {
+    	// Dialog to set up whether to delete by group or not
+        List<String> choiceArray = new ArrayList<>();
+        choiceArray.add("Yes");
+        choiceArray.add("No");
+  	    ChoiceDialog<String> deleteByGroupDialog = new ChoiceDialog<>("No", choiceArray);
+  	    deleteByGroupDialog.setTitle("Article Deletion");
+  	    deleteByGroupDialog.setHeaderText("Confirmation");
+  	    deleteByGroupDialog.setContentText("Would you like to delete by group/special access group?");
+    	Optional<String> deleteByGroupDialogResult = deleteByGroupDialog.showAndWait();
+  	    
+	    if (deleteByGroupDialogResult.isPresent()) {							
+	        String deleteByGroup = deleteByGroupDialogResult.get(); // Check if yes or no
+	        
+	        // Get article group input if yes
+	        TextInputDialog deleteGroupInputDialog = new TextInputDialog();
+	        deleteGroupInputDialog.setHeaderText("Enter the name of the special access group you wish to delete "
+	  	    		+ "or simply enter General to delete all General groups:");
+	        Optional<String> deleteGroupInputDialogResult;
+	        String articleGroup;
+	        
+	        // Get article title input if no
+	        TextInputDialog articleTitleDialog = new TextInputDialog();
+	  	    articleTitleDialog.setHeaderText("Enter the title of the article you wish to delete:");
+	        String articletitle;
+	        Optional<String> articletitleResult;
+	        
+	        if (deleteByGroup.equals("Yes")) { // Delete article(s) by group
+	        	deleteGroupInputDialogResult = deleteGroupInputDialog.showAndWait();
+	        	
+	        	if (deleteGroupInputDialogResult.isPresent()) {
+	        		articleGroup = deleteGroupInputDialogResult.get();
+	        		articleDHelper.deleteArticle("None", articleGroup);
+	        	}
+	        	
+	        } else if (deleteByGroup.equals("No")) { // Delete article by title
+	        	articletitleResult = articleTitleDialog.showAndWait();
+	        	articletitle = articletitleResult.get();
+	        	articleDHelper.deleteArticle(articletitle, "None");
+	        } else { // Error occured
+	        	System.out.print("Error Occured");
+	        }
+	        
+	    }
     }
     
     // Private method that handles the main backup/restore actions based on user input.

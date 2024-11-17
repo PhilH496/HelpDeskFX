@@ -179,21 +179,27 @@ class articleDatabaseHelper {
 	    return true;
 	}
 	
-	// deleteArticle will delete a specific article specified by its title 
-	public void deleteArticle(String title) throws SQLException {
-	    String deleteUserQuery = "DELETE FROM cse360article WHERE title = ?";
-	    try (PreparedStatement pstmt = connection.prepareStatement(deleteUserQuery)) {
-	        pstmt.setString(1, title);
-	        int rowsAffected = pstmt.executeUpdate();
-	        
-	        if (rowsAffected > 0) {
-	            System.out.println("Article with title \"" + title + "\" deleted successfully.");
-	        } else {
-	            System.out.println("No article found with title \"" + title + "\".");
-	        }
-	    } catch (SQLException e) {
-	        e.printStackTrace();
-	    }
+	// deleteArticle will delete an article specified by it's given title 
+	// or delete article(s) by their group type
+	public void deleteArticle(String title, String groupType) throws SQLException {
+		String sql; 
+		if (groupType.equals("None")) { // Construct sql based on given args
+			sql = "DELETE FROM cse360article WHERE title = ?"; 
+		} else {
+			sql = "DELETE FROM cse360article WHERE groupType = ?";
+		}
+		    
+		try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+			if (groupType.equals("None")) {
+				preparedStatement.setString(1, title); // Delete by title
+			} else {
+				preparedStatement.setString(1, "General Group"); // Delete by group type
+			}
+			int rowsDeleted = preparedStatement.executeUpdate();
+			System.out.println(rowsDeleted + " rows deleted.");
+		} catch (SQLException e) { // Error occured
+			e.printStackTrace();
+		}
 	}
 	/*
 	 * displayArticles will grab every item in the database for articles and list it out dependent on what the user wants.
@@ -305,9 +311,6 @@ class articleDatabaseHelper {
 	        String author = rs.getString("author");
 	        String abstracts = rs.getString("abstract");
 	        String keywords = rs.getString("keywords");
-	        String body = rs.getString("body");
-	        String references = rs.getString("references");
-	        
 
 	        // Append article details to the StringBuilder
 	        articleDetails.append("Group Type: ").append(groupType).append("\n")
@@ -319,17 +322,6 @@ class articleDatabaseHelper {
 	                .append("Abstract: ").append(abstracts).append("\n")
 	                .append("Keyword(s): ").append(keywords).append("\n")
 	        		.append("-------------\n");
-	        
-	        /*If admin, hide body and references
-	        if (!userRole.equals("Admin")) {
-	            articles.append("Body: ").append(body).append("\n")
-                .append("Reference(s): ").append(references).append("\n");
-	        } else {
-	            articles.append("Body: [Hidden]\n")
-	                    .append("Reference(s): [Hidden]\n");
-	        }
-			*/
-	        //articles.append("-------------\n");
 	        
 	       count++;
 	    }
