@@ -134,5 +134,6 @@ public class login {
         layout.setAlignment(Pos.CENTER);
         layout.getChildren().addAll(title, userName, usernameField, password, passwordField, userOrPass, signingInButt, accButt);
         return new Scene(layout, 600, 600);
+        
     }
 }

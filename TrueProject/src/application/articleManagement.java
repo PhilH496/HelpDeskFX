@@ -212,7 +212,6 @@ public class articleManagement {
             try {
 				dbHelper.connectToDatabase();
 			} catch (SQLException e1) {
-				// TODO Auto-generated catch block
 				e1.printStackTrace();
 			}
             	try { //if user is already in a group, they can't make a new group. Only articles in same group.
@@ -238,7 +237,6 @@ public class articleManagement {
 		                primaryStage.setScene(getScene(primaryStage, userRole, userName)); // Return to main scene after creating article
 					}
 				} catch (SQLException e1) {
-					// TODO Auto-generated catch block
 					e1.printStackTrace();
 				}
         	}

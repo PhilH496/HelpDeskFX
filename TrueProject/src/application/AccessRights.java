@@ -2,24 +2,26 @@ package application;
 
 import java.sql.SQLException;
 import java.util.List;
-
+import java.util.Optional;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
-import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
+import javafx.scene.control.TextInputDialog;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 
 public class AccessRights {
+	private static final DatabaseHelper databaseHelper = new DatabaseHelper();
 	public Scene getScene(Stage primaryStage, String userRole, String userName) {
 		
         VBox cb = new VBox(20);
@@ -48,6 +50,19 @@ public class AccessRights {
         listOrDeleteViewingRights.setMinHeight(50);
         listOrDeleteViewingRights.setOnAction(e -> displayUsers(primaryStage, userName, userRole, "view"));
         
+        Button deleteAccess = new Button("Remove user from General/Special Access group");
+        deleteAccess.setMaxWidth(500);   
+        deleteAccess.setMinHeight(50);
+        deleteAccess.setOnAction(e -> {
+			try {
+				deleteAccess();
+			} catch (SQLException e1) {
+				e1.printStackTrace();
+			}
+		});
+        if (!userRole.equals("Admin")) {
+        	deleteAccess.setVisible(false);
+        }
         
 
         // Go back to article management
@@ -59,12 +74,28 @@ public class AccessRights {
             primaryStage.setScene(back.getScene(primaryStage, userRole, userName));
         });
         
-        
-        cb.getChildren().addAll(label, adminRights, viewingRights, listOrDeleteAdminRights, listOrDeleteViewingRights, backButton);
+        cb.getChildren().addAll(label, adminRights, viewingRights, listOrDeleteAdminRights, listOrDeleteViewingRights, deleteAccess, backButton);
 
         return new Scene(cb, 600, 600);
 	}
 	
+	private void deleteAccess() throws SQLException {
+		// Dialog to prompt the user to enter the ID of the user wish to send to the help system
+  	   	TextInputDialog idInputDialog = new TextInputDialog();
+  	   	idInputDialog.setHeaderText("Enter the ID of the user you wish to remove access from:");
+  	        
+  	   	Optional<String> idInputDialogResult = idInputDialog.showAndWait();
+  	   	if (idInputDialogResult.isPresent()) {
+  	   		int id = Integer.parseInt(idInputDialogResult.get());
+  	   		databaseHelper.connectToDatabase();
+  	   		databaseHelper.deleteSpecialAccess(id);
+  	   		databaseHelper.closeConnection();
+  	   	} else {
+  	   		Label messageInputCanceled = new Label("Message type not selected");
+  	   		messageInputCanceled.setTextFill(Color.RED);
+  	   	}
+	}
+
 	private static void displayUsers(Stage primaryStage, String name, String userRole, String viewOrAdmin) {
 	    try {
 	        DatabaseHelper databaseHelper = new DatabaseHelper();
@@ -167,8 +198,6 @@ public class AccessRights {
 	        e1.printStackTrace();
 	    }
 	}
-
-	
 	
 	private void adminRightsPopup(String userName) {
         Stage dialog = new Stage();
@@ -189,21 +218,20 @@ public class AccessRights {
         submitButton.setOnAction(event -> {
             String group = groupField.getText();  // Group name
             String username = usernameField.getText();  // Correct username input from text field
-            DatabaseHelper dbHelper = new DatabaseHelper();
+            DatabaseHelper databaseHelper = new DatabaseHelper();
          
             try {
-				dbHelper.connectToDatabase();
+				databaseHelper.connectToDatabase();
 			} catch (SQLException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 
             try
             {
-	            String userSpecialGroup = dbHelper.getSpecialAccessGroup(userName);
-	            if (userSpecialGroup.equals(group) || dbHelper.isGroupInAdminRights(userName, group))
+	            String userSpecialGroup = databaseHelper.getSpecialAccessGroup(userName);
+	            if (userSpecialGroup.equals(group) || databaseHelper.isGroupInAdminRights(userName, group))
 	            {
-	            	dbHelper.updateAdminRights(username, group);
+	            	databaseHelper.updateAdminRights(username, group);
 	                // Display confirmation alert with correct group and username
 	                Alert confirmationAlert = new Alert(AlertType.INFORMATION, 
 	                    "Group: " + group + "\nUsername: " + username);
@@ -220,7 +248,6 @@ public class AccessRights {
 	                alert.showAndWait();
 	            }
             }  catch (SQLException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
             
@@ -254,7 +281,6 @@ public class AccessRights {
 	    submitButton.setOnAction(event -> {
 	        String group = groupField.getText().trim();  // Group name
 	        String username = usernameField.getText();  // Correct username input from text field
-	        DatabaseHelper dbHelper = new DatabaseHelper();
 
 	        if (group.isEmpty() || username.isEmpty()) {
 	            Alert alert = new Alert(AlertType.ERROR, "Group and Username must not be empty!");
@@ -263,15 +289,15 @@ public class AccessRights {
 	        }
 
 	        try {
-	            dbHelper.connectToDatabase();  // Ensure the DB connection is successful
+	            databaseHelper.connectToDatabase();  // Ensure the DB connection is successful
 	        } catch (SQLException e) {
 	            e.printStackTrace();
 	        }
 	        try {
-	            String userSpecialGroup = dbHelper.getSpecialAccessGroup(username);
-	            if (userSpecialGroup.equals(group) || dbHelper.isGroupInAdminRights(userName, group))
+	            String userSpecialGroup = databaseHelper.getSpecialAccessGroup(username);
+	            if (userSpecialGroup.equals(group) || databaseHelper.isGroupInAdminRights(userName, group))
 	            {
-	            	dbHelper.updateViewingRights(username, group);
+	            	databaseHelper.updateViewingRights(username, group);
 	    	        // Display confirmation alert with correct group and username
 	    	        Alert confirmationAlert = new Alert(AlertType.INFORMATION,
 	    	            "Group: " + group + "\nUsername: " + username);
@@ -288,7 +314,6 @@ public class AccessRights {
 	                alert.showAndWait();
 	            }
 	        }  catch (SQLException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 	        
@@ -301,5 +326,4 @@ public class AccessRights {
 	    dialog.setScene(dialogScene);
 	    dialog.show();
 	}
-
 }

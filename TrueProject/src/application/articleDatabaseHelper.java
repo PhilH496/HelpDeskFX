@@ -1,10 +1,9 @@
 package application;
+
 import java.sql.*;
 import java.util.Base64;
-
 import Encryption.EncryptionHelper;
 import Encryption.EncryptionUtils;
-
 import java.io.*;
 /*
  * This portion creates the main database functionalities of when called upon in the main.

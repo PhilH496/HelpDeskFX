@@ -1,8 +1,8 @@
 package application;
+
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
-
 
 class DatabaseHelper {
 
@@ -377,6 +377,45 @@ class DatabaseHelper {
 	    }
 	}
 	
+	public void deleteSpecialAccess(int id) throws SQLException { 
+		 String fetchGroupSql = "SELECT specialAccessGroup FROM cse360users WHERE id = ?";
+		    String group = null;
+
+		    try (PreparedStatement fetchStmt = connection.prepareStatement(fetchGroupSql)) {
+		        fetchStmt.setInt(1, id);
+		        try (ResultSet resultSet = fetchStmt.executeQuery()) {
+		            if (resultSet.next()) {
+		                group = resultSet.getString("specialAccessGroup");
+		            } else {
+		                System.out.println("No user found with the specified ID.");
+		                return; // Exit if no user is found
+		            }
+		        }
+		    }
+	    String updateSql = """
+	        UPDATE cse360users 
+	        SET 
+	            specialAccessGroup = NULL, 
+	            viewingRights = REPLACE(viewingRights, ?, ''), 
+	            adminRights = REPLACE(adminRights, ?, '') 
+	        WHERE id = ?
+	    """;
+	    
+	    try (PreparedStatement updateStmt = connection.prepareStatement(updateSql)) {
+	        updateStmt.setString(1, group); // Remove matching group from viewingRights
+	        updateStmt.setString(2, group); // Remove matching group from adminRights
+	        updateStmt.setInt(3, id); // Specify the user ID
+
+	        int rowsAffected = updateStmt.executeUpdate();
+
+	        if (rowsAffected > 0) {
+	            System.out.println("Special access rights updated successfully.");
+	        } else {
+	            System.out.println("Failed to update special access rights.");
+	        }
+	    }
+	}
+	
 	public void deleteViewingRights(String username, String group) throws SQLException {
 	    // Retrieve the current viewing rights for the user
 	    String query = "SELECT viewingRights FROM cse360users WHERE username = ?";
@@ -468,9 +507,6 @@ class DatabaseHelper {
 	        System.out.println("Group not found in admin rights.");
 	    }
 	}
-
-	
-	
 	
 	public boolean isGroupInAdminRights(String username, String group) throws SQLException {
 	    String query = "SELECT adminRights FROM cse360users WHERE username = ? AND adminRights IS NOT NULL";
