@@ -108,9 +108,6 @@ class DatabaseHelper {
 			String username = rs.getString("username"); 
 			String password = rs.getString("password"); 
 			String role = rs.getString("role");  
-			String prefName = rs.getString("preferred_name");
-			String name = rs.getString("name");
-			String email = rs.getString("email");
 			String specialGroup = rs.getString("specialAccessGroup");
 			String viewingRights = rs.getString("viewingRights");
 			String adminRights = rs.getString("adminRights");
@@ -120,9 +117,6 @@ class DatabaseHelper {
 			System.out.print(", Username: " + username); 
 			System.out.print(", Password: " + password); 
 			System.out.println(", Role: " + role + ", "); 
-			//System.out.print(", Preferred name: " + prefName); 
-			//System.out.print(", Name: " + name); 
-			//System.out.print(", Email: " + email); 
 			System.out.println("Special Access Group: " + specialGroup);
 			System.out.println("ViewingRights: " + viewingRights);
 			System.out.println("AdminRights: " + adminRights);

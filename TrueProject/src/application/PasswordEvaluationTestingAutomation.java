@@ -24,43 +24,6 @@ public class PasswordEvaluationTestingAutomation {
 	}
 
 	static String performTestCase(int testCase, String inputText, boolean expectedPass) {
-	//	System.out.println("____________________________________________________________________________\n\nTest case: " + testCase);
-		//System.out.println("Input: \"" + inputText + "\"");
-	//	System.out.println("______________");
-	//	System.out.println("\nFinite state machine execution trace:");
-		
-		String resultText= PasswordEvaluator.evaluatePassword(inputText);
-		
-	/*	System.out.println();
-		
-		if (resultText != "") {
-			if (expectedPass) {
-				System.out.println("***Failure*** The password <" + inputText + "> is invalid." + 
-						"\nBut it was supposed to be valid, so this is a failure!\n");
-				System.out.println("Error message: " + resultText);
-				numFailed++;
-			}
-			else {			
-				System.out.println("***Success*** The password <" + inputText + "> is invalid." + 
-						"\nBut it was supposed to be invalid, so this is a pass!\n");
-				System.out.println("Error message: " + resultText);
-				numPassed++;
-			}
-		}
-		
-		else {	
-			if (expectedPass) {	
-				System.out.println("***Success*** The password <" + inputText + 
-						"> is valid, so this is a pass!");
-				numPassed++;
-			}
-			else {
-				System.out.println("***Failure*** The password <" + inputText + 
-						"> was judged as valid" + 
-						"\nBut it was supposed to be invalid, so this is a failure!");
-				numFailed++;
-			}
-		}*/
 		String word = displayEvaluation();
 		return word;
 	}

@@ -40,7 +40,7 @@ class articleDatabaseHelper {
 	}
 	// Used to create database table, adding necessary article items like ID, level, group title, author, 
 	// abstract, keywords, body, references
-	private void createTables() throws SQLException {
+	public void createTables() throws SQLException {
 		String userTable = "CREATE TABLE IF NOT EXISTS cse360article ("
 				+ "groupType VARCHAR(255), "
 		        + "id INT AUTO_INCREMENT PRIMARY KEY, "
@@ -68,7 +68,6 @@ class articleDatabaseHelper {
 		Statement stmt = connection.createStatement();
 		ResultSet rs = stmt.executeQuery(sql); 
 		FileWriter myWriter = new FileWriter(file);
-		int count = 0;
 		while(rs.next()) { 
 			String groupType = rs.getString("groupType");
 			String level = rs.getString("level");
@@ -293,7 +292,7 @@ class articleDatabaseHelper {
 	    return article.toString();
 	}
 	
-	public String displayArticles(String userRole) throws Exception {
+	public String displayArticles() throws Exception {
 	    StringBuilder articleDetails = new StringBuilder();
 	    StringBuilder result = new StringBuilder();
 	    String sql = "SELECT * FROM cse360article"; 

@@ -10,6 +10,7 @@ public class Main extends Application {
 		try {
             login loginScene = new login();
             //databaseAutomatedTesting.automateTesting(); // to simulate testing, uncomment
+            //articleDatabaseAutomatedTesting.runTests(); // to simulate testing, uncomment
             //Set automatically to be at the login page. Just setting up basics
             primaryStage.setTitle("ASU Help System"); 
             primaryStage.setScene(loginScene.getScene(primaryStage));
@@ -31,8 +32,9 @@ public class Main extends Application {
             } else {
                 System.out.println("Database already contains users. Registering additional user...");
             }
-            System.out.println("Displaying all users (admin view):");
+            System.out.println("========== START OF ADMIN VIEW ==========");
             dbHelper.displayUsersByAdmin();
+            System.out.println("========== END OF ADMIN VIEW ==========");
         } catch (Exception e) {
             e.printStackTrace();
         } finally {

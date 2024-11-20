@@ -159,7 +159,7 @@ public class listAllArticles {
         try {
             String articles;
             if (keyword == null || keyword.isEmpty() && (skillLevel == null || skillLevel.isEmpty())) {
-                articles = articleDBelper.displayArticles(userRole); // Display all if no keyword is provided
+                articles = articleDBelper.displayArticles(); // Display all if no keyword is provided
             } 
             else {
                 articles = articleDBelper.searchByKeywordAndLevel(keyword, skillLevel); // Search by keyword/level
