@@ -241,7 +241,7 @@ public class articleManagement {
 				}
         	}
         	else
-        	{
+        	{ //else don't change anything and just display basic info
 	           	articleDHelper.articleCreation(groupTypeComboBox.getValue(), levelComboBox.getValue(), groupsComboBox.getValue(), titleField.getText(), 
                 		authorField.getText(), abstractArea.getText(), keywordsField.getText(), 
                 		bodyArea.getText(), referencesArea.getText(), false, -1);

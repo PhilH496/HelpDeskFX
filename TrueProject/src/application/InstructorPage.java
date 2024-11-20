@@ -103,7 +103,7 @@ public class InstructorPage {
         
         return new Scene(contentBox, 800, 600);
     }
-    
+    //gets the preferred name for display
     private String getPrefName(String username) throws SQLException {
         DatabaseHelper db = new DatabaseHelper();
         db.connectToDatabase();

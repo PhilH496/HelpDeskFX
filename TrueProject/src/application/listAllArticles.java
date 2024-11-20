@@ -81,7 +81,7 @@ public class listAllArticles {
             displayArticles(articlesArea, keyword, skillLevel, userRole);
             editButton.setVisible(false);
         });
-        
+        // This part changes the visibility of the edit button and gets the article. If access rights are correct, edit button will display as well
         viewButton.setOnAction(e -> {
         	try {
 				sequenceNumber = viewArticle(articlesArea, userName);
@@ -175,6 +175,7 @@ public class listAllArticles {
         }
     }
     
+    //Button to view article entirely with body and reference (changes depending on rights)
     private int viewArticle(TextArea articlesArea, String userName) throws Exception {
         TextInputDialog sequenceNumberInput = new TextInputDialog();
         sequenceNumberInput.setHeaderText("Enter the sequence number of the article you want to view: ");
@@ -195,6 +196,7 @@ public class listAllArticles {
         return -1; // Return -1 if no input was provided
     }
     
+    //Ability to edit article and change anything about it
     private void editArticle(Stage primaryStage, String userRole, String userName, int sequenceNumber) throws Exception {
     	String article[] = articleDBelper.updateArticle(sequenceNumber); 
     	
@@ -254,7 +256,6 @@ public class listAllArticles {
                 // Get the entered name
                 dialog.showAndWait().ifPresent(name -> {
                     if (!name.isEmpty()) {
-                        // Optionally add the new name to the ComboBox or perform other actions
                         groupTypeComboBox.getItems().add(name);
                         groupTypeComboBox.setValue(name); // Select the new group name
                     } else {

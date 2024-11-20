@@ -9,6 +9,7 @@ public class Main extends Application {
 	public void start(Stage primaryStage) {	
 		try {
             login loginScene = new login();
+            //databaseAutomatedTesting.automateTesting(); // to simulate testing, uncomment
             //Set automatically to be at the login page. Just setting up basics
             primaryStage.setTitle("ASU Help System"); 
             primaryStage.setScene(loginScene.getScene(primaryStage));

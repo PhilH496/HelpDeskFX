@@ -29,7 +29,7 @@ class DatabaseHelper {
 			System.err.println("JDBC Driver not found: " + e.getMessage());
 		}
 	}
-
+	//Creation of sql table for needed saved information
 	private void createTables() throws SQLException {
 	    String userTable = "CREATE TABLE IF NOT EXISTS cse360users ("
 	            + "id INT AUTO_INCREMENT PRIMARY KEY, "
@@ -56,7 +56,8 @@ class DatabaseHelper {
 		}
 		return true;
 	}
-
+	
+	//registers user into database with username, password, role
 	public void register(String username, String password, String role) throws SQLException {
 		String insertUser = "INSERT INTO cse360users (username, password, role) VALUES (?, ?, ?)";
 		try (PreparedStatement pstmt = connection.prepareStatement(insertUser)) {
@@ -78,7 +79,7 @@ class DatabaseHelper {
 			}
 		}
 	}
-	
+
 	public boolean doesUserExist(String username) {
 	    String query = "SELECT COUNT(*) FROM cse360users WHERE username = ?";
 	    try (PreparedStatement pstmt = connection.prepareStatement(query)) {
@@ -95,6 +96,7 @@ class DatabaseHelper {
 	    return false; // If an error occurs, assume user doesn't exist
 	}
 
+	//Displays all users along with their roles, rights, etc.
 	public void displayUsersByAdmin() throws SQLException{
 		String sql = "SELECT * FROM cse360users"; 
 		Statement stmt = connection.createStatement();
@@ -239,12 +241,13 @@ class DatabaseHelper {
 	    return prefname;
 	}
 	
+	//Obtains the user special access group via sql. Mainly for comparison checking
 	public String getSpecialAccessGroup(String userName) throws SQLException {
 	    String sql = "SELECT specialAccessGroup FROM cse360users WHERE username = ?";
 
 	    try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
 
-	        pstmt.setString(1, userName);  // Use pstmt, not stmt
+	        pstmt.setString(1, userName);  
 	        ResultSet rs = pstmt.executeQuery(); 
 
 	        // If a record exists, return the special access group
@@ -256,29 +259,29 @@ class DatabaseHelper {
 	    }
 	}
 
+	//Updates the special group if no group is found or it needs to change
 	public void updateSpecialGroup(String newGroup, String userName) {
 	    if (newGroup == null || newGroup.isEmpty()) {
 	        System.out.println("Invalid group name.");
-	        return; // Early exit if newGroup is invalid
+	        return; // if newGroup is invalid
 	    }
 
 	    if (userName == null || userName.isEmpty()) {
 	        System.out.println("Invalid username.");
-	        return; // Early exit if userName is invalid
+	        return; // userName is invalid
 	    }
 
 	    String updateQuery = "UPDATE cse360users SET specialAccessGroup = ? WHERE username = ?";
 
 	    try (PreparedStatement pstmt = connection.prepareStatement(updateQuery)) {
 	        pstmt.setString(1, newGroup);  // Set the new group for the specialAccessGroup column
-	        pstmt.setString(2, userName);  // Set the username to target the correct user
+	        pstmt.setString(2, userName);  // Set username
 
-	        // Print the query for debugging (optional)
 	        System.out.println("Executing query: " + updateQuery);
 	        System.out.println("With values: newGroup=" + newGroup + ", userName=" + userName);
 
 	        int rowsAffected = pstmt.executeUpdate();  // Execute the update
-
+	       
 	        if (rowsAffected > 0) {
 	            System.out.println("Special access group updated successfully for user: " + userName);
 	        } else {
@@ -286,10 +289,11 @@ class DatabaseHelper {
 	        }
 	    } catch (SQLException e) {
 	        System.out.println("Error executing update: " + e.getMessage());
-	        e.printStackTrace();  // Print the stack trace for debugging
+	        e.printStackTrace();
 	    }
 	}
 	
+	//Update the user's viewing rights to add people to see articles
 	public void updateViewingRights(String username, String group) throws SQLException {
 	    // Retrieve the current viewing rights for the user
 	    String query = "SELECT viewingRights FROM cse360users WHERE username = ?";
@@ -309,7 +313,7 @@ class DatabaseHelper {
 	        currentViewingRights = "";  // In case the viewingRights column is null
 	    }
 
-	    // Only append the group name if it's not already present
+	    // Only appends group name if it's not already present
 	    if (!currentViewingRights.contains(group)) {
 	        // If currentViewingRights is empty, set group as the first group
 	        String updatedViewingRights = currentViewingRights.isEmpty() ? group : currentViewingRights + "," + group;
@@ -334,6 +338,7 @@ class DatabaseHelper {
 	}
 
 	
+	//Similar to updateViewingRights, this will update admin rights so a user may have admin rights
 	public void updateAdminRights(String userName, String groupName) throws SQLException {
 	    // Retrieve the current admin rights for the user
 	    String query = "SELECT adminRights FROM cse360users WHERE username = ?";
@@ -353,7 +358,6 @@ class DatabaseHelper {
 	        currentAdminRights = ""; // In case the adminRights column is null
 	    }
 
-	    // Only append the group name if it's not already present
 	    if (!currentAdminRights.contains(groupName)) {
 	        // If currentAdminRights is empty, set groupName as the first group
 	        String updatedAdminRights = currentAdminRights.isEmpty() ? groupName : currentAdminRights + "," + groupName;
@@ -377,6 +381,7 @@ class DatabaseHelper {
 	    }
 	}
 	
+	//To delete special access group from a user if needed
 	public void deleteSpecialAccess(int id) throws SQLException { 
 		 String fetchGroupSql = "SELECT specialAccessGroup FROM cse360users WHERE id = ?";
 		    String group = null;
@@ -416,6 +421,7 @@ class DatabaseHelper {
 	    }
 	}
 	
+	// Deletes viewing rights of a user, typicallly student (usually if user is admin or owner of group)
 	public void deleteViewingRights(String username, String group) throws SQLException {
 	    // Retrieve the current viewing rights for the user
 	    String query = "SELECT viewingRights FROM cse360users WHERE username = ?";
@@ -461,7 +467,8 @@ class DatabaseHelper {
 	        System.out.println("Group not found in viewing rights.");
 	    }
 	}
-
+	
+	//Deletes admin rights in case user should not be apart of it
 	public void deleteAdminRights(String username, String group) throws SQLException {
 	    // Retrieve the current admin rights for the user
 	    String query = "SELECT adminRights FROM cse360users WHERE username = ?";
@@ -508,6 +515,7 @@ class DatabaseHelper {
 	    }
 	}
 	
+	//Checks if a user has admin rights to a group. So, this checks if the user is in that group first
 	public boolean isGroupInAdminRights(String username, String group) throws SQLException {
 	    String query = "SELECT adminRights FROM cse360users WHERE username = ? AND adminRights IS NOT NULL";
 	    
@@ -530,6 +538,7 @@ class DatabaseHelper {
 	    return false; // Group not found in the admin rights for this user
 	}
 	
+	//Checks if user has viewing rights instead to a group and compares it via what group user is in
 	public boolean isGroupInViewingRights(String username, String group) throws SQLException {
 	    // Return false immediately if group is null
 	    if (group == null) {
@@ -549,16 +558,17 @@ class DatabaseHelper {
 	                // Split viewingRights by commas and check if the group is present
 	                String[] rightsArray = viewingRights.split(",");
 	                for (String right : rightsArray) {
-	                    if (right.trim().equals(group)) { // Check for exact match after trimming
+	                    if (right.trim().equals(group)) { // Check for exact match
 	                        return true; // Group found in the viewing rights for this user
 	                    }
 	                }
 	            }
 	        }
 	    }
-	    return false; // Group not found in the user's viewing rights
+	    return false; // In case not found
 	}
 	
+	//returns all usernames in the viewing rights group
     public List<String> getUsernamesByViewingRightsGroup(String group) throws SQLException {
         List<String> usernames = new ArrayList<>();
         
@@ -578,6 +588,7 @@ class DatabaseHelper {
         return usernames;
     }
 	
+    // returns all usernames in the admin rights group
     public List<String> getUsernamesByAdminRightsGroup(String group) throws SQLException {
         List<String> usernames = new ArrayList<>();
         

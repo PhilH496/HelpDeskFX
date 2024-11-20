@@ -202,8 +202,7 @@ class articleDatabaseHelper {
 	}
 	/*
 	 * displayArticles will grab every item in the database for articles and list it out dependent on what the user wants.
-	 * Besides the title, author, and id number, everything else will be encrypted and only decrypted when called upon. This
-	 * feature will be added later on.
+	 * Besides the title, author, and id number, everything else will be encrypted and only decrypted when called upon.
 	 */
 	public String viewArticle(int sequenceNumber, String userName) throws Exception {
 		String findUserQuery = "SELECT * FROM cse360article WHERE id = ?";
@@ -223,6 +222,7 @@ class articleDatabaseHelper {
     	        String body = rs.getString("body");
     	        String references = rs.getString("references");
     	        
+    	        //This portion will encrypt and decrypt the body and reference for security
     	        String encryptedBody = Base64.getEncoder().encodeToString(
     		            encryptionHelper.encrypt(body.getBytes(), EncryptionUtils.getInitializationVector(author.toCharArray()))
     		        );
@@ -245,7 +245,7 @@ class articleDatabaseHelper {
                 databaseHelp.connectToDatabase();
                 String userGroupType = databaseHelp.getSpecialAccessGroup(userName);
     	        if (!groupType.equals("General Group")) // if this is a special group
-    	        {
+    	        { // Depending if the user has access, it will only show the encrypted portion if user does not. Else, shows the decrypted portion
     	        	if ((userGroupType != null && groupType.equals(userGroupType)) || 
     	        			(userGroupType != null && databaseHelp.isGroupInViewingRights(userName, groupType)) ||
     	        			(userGroupType == null && databaseHelp.isGroupInViewingRights(userName, groupType))) //if special group name == user's group
@@ -276,7 +276,7 @@ class articleDatabaseHelper {
     	        	}
     	        }
     	        else
-    	        {
+    	        {//If this is a general group, no need to encrypt
     	        article.append("Sequence Number: ").append(id).append("\n")
     	        		.append("Level: ").append(level).append("\n")
     	        		.append("Group: ").append(group).append("\n")
@@ -311,7 +311,7 @@ class articleDatabaseHelper {
 	        String abstracts = rs.getString("abstract");
 	        String keywords = rs.getString("keywords");
 
-	        // Append article details to the StringBuilder
+	        // Append article details to the StringBuilder to show everything
 	        articleDetails.append("Group Type: ").append(groupType).append("\n")
 	        		.append("ID: ").append(id).append("\n")
 	        		.append("Level: ").append(level).append("\n")
@@ -390,7 +390,7 @@ class articleDatabaseHelper {
             stmt.setString(2, searchPattern);
             stmt.setString(3, searchPattern);
             stmt.setString(4, searchPattern);
-            
+            //In case skilllevel unchecked, set everything
             if (skillLevel != null && !skillLevel.isEmpty()) {
                 stmt.setString(5, skillLevel);
             }
@@ -415,7 +415,7 @@ class articleDatabaseHelper {
     	                .append("Keyword(s): ").append(keywords).append("\n")
     	                .append("-------------\n");
     	        count++;
-            }
+            } 
             result.append("Total Article Count: " + count + "\n\n");
             result.append(articleDetails);
         }
@@ -435,6 +435,7 @@ class articleDatabaseHelper {
 		} 
 	}
 	
+	//Updates the article accordingly via sequence number. Adds everything to article
 	public String[] updateArticle(int sequenceNumber) throws Exception {
 	    String sql = "SELECT * FROM cse360article WHERE id = " + "'" + sequenceNumber + "'";
 	    String article[] = new String[9];
@@ -465,6 +466,7 @@ class articleDatabaseHelper {
 		return article;
 	}
 	
+	//Gets the groupType of the user as either general or specific special group
 	public String getGroupType(int articleId) throws SQLException {
 	    String groupType = null;
 	    String sql = "SELECT groupType FROM cse360article WHERE id = ?";

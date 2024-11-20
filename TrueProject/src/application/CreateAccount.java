@@ -25,7 +25,7 @@ public class CreateAccount {
               System.out.println("Registering " + username + "....");
               if (role.equals("Student"))
               {
-            	  db.updateSpecialGroup("General Group", username);
+            	  db.updateSpecialGroup("General Group", username); //Automatically puts student into the General Group
               }
            } catch (SQLException ex) {
                ex.printStackTrace(); 

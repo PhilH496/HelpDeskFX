@@ -19,7 +19,11 @@ import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
-
+/*
+ * This class checks if a user has access rights to specific groups. Additionally,
+ * this class will allow users to add/remove users to have admin/viewing rights. It
+ * will also list users under groups as well.
+ */
 public class AccessRights {
 	private static final DatabaseHelper databaseHelper = new DatabaseHelper();
 	public Scene getScene(Stage primaryStage, String userRole, String userName) {
@@ -27,6 +31,7 @@ public class AccessRights {
         VBox cb = new VBox(20);
         cb.setAlignment(Pos.TOP_CENTER);
         
+        //This area sets up the buttons and style of the page first
         Label label = new Label("Access Rights Management");
         label.setStyle("-fx-font-weight: bold; -fx-font-size: 30px; -fx-font-family: 'Roboto';");
         
@@ -65,7 +70,7 @@ public class AccessRights {
         }
         
 
-        // Go back to article management
+        // Go back to article management page
         Button backButton = new Button("Back to Article Management");
         backButton.setMaxWidth(500);
         backButton.setMinHeight(50);
@@ -79,6 +84,7 @@ public class AccessRights {
         return new Scene(cb, 600, 600);
 	}
 	
+	//Deletes access to user
 	private void deleteAccess() throws SQLException {
 		// Dialog to prompt the user to enter the ID of the user wish to send to the help system
   	   	TextInputDialog idInputDialog = new TextInputDialog();
@@ -96,6 +102,7 @@ public class AccessRights {
   	   	}
 	}
 
+	//Displays all users in a specific group
 	private static void displayUsers(Stage primaryStage, String name, String userRole, String viewOrAdmin) {
 	    try {
 	        DatabaseHelper databaseHelper = new DatabaseHelper();
@@ -199,6 +206,7 @@ public class AccessRights {
 	    }
 	}
 	
+	//Popup menu in case adding user to have admin rights
 	private void adminRightsPopup(String userName) {
         Stage dialog = new Stage();
         dialog.initModality(Modality.APPLICATION_MODAL);
@@ -213,11 +221,11 @@ public class AccessRights {
         TextField usernameField = new TextField();
         usernameField.setPromptText("Enter Username");
 
-        // Display confiration after submit
+        // Confirmation
         Button submitButton = new Button("Submit");
         submitButton.setOnAction(event -> {
             String group = groupField.getText();  // Group name
-            String username = usernameField.getText();  // Correct username input from text field
+            String username = usernameField.getText();  // username input
             DatabaseHelper databaseHelper = new DatabaseHelper();
          
             try {
@@ -228,8 +236,8 @@ public class AccessRights {
 
             try
             {
-	            String userSpecialGroup = databaseHelper.getSpecialAccessGroup(userName);
-	            if (userSpecialGroup.equals(group) || databaseHelper.isGroupInAdminRights(userName, group))
+	            String userSpecialGroup = databaseHelper.getSpecialAccessGroup(userName); // grabs special group
+	            if (userSpecialGroup.equals(group) || databaseHelper.isGroupInAdminRights(userName, group)) //compares if user group has the rights
 	            {
 	            	databaseHelper.updateAdminRights(username, group);
 	                // Display confirmation alert with correct group and username
@@ -262,6 +270,7 @@ public class AccessRights {
         dialog.show();
     }
 	
+	//Creates popup menu to add people to viewing rights
 	private void viewingRightsPopup(String userName) {
 	    Stage dialog = new Stage();
 	    dialog.initModality(Modality.APPLICATION_MODAL);
@@ -279,8 +288,8 @@ public class AccessRights {
 	    // Display confirmation after submit
 	    Button submitButton = new Button("Submit");
 	    submitButton.setOnAction(event -> {
-	        String group = groupField.getText().trim();  // Group name
-	        String username = usernameField.getText();  // Correct username input from text field
+	        String group = groupField.getText().trim(); 
+	        String username = usernameField.getText();  
 
 	        if (group.isEmpty() || username.isEmpty()) {
 	            Alert alert = new Alert(AlertType.ERROR, "Group and Username must not be empty!");
@@ -289,13 +298,13 @@ public class AccessRights {
 	        }
 
 	        try {
-	            databaseHelper.connectToDatabase();  // Ensure the DB connection is successful
+	            databaseHelper.connectToDatabase();  
 	        } catch (SQLException e) {
 	            e.printStackTrace();
 	        }
 	        try {
 	            String userSpecialGroup = databaseHelper.getSpecialAccessGroup(username);
-	            if (userSpecialGroup.equals(group) || databaseHelper.isGroupInAdminRights(userName, group))
+	            if (userSpecialGroup.equals(group) || databaseHelper.isGroupInAdminRights(userName, group)) //Checks if user has access to add person to viewing rights
 	            {
 	            	databaseHelper.updateViewingRights(username, group);
 	    	        // Display confirmation alert with correct group and username
