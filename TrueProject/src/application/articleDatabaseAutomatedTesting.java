@@ -30,8 +30,8 @@ public class articleDatabaseAutomatedTesting {
                 "Here are a bunch of tips and tricks to learn when using Eclipse.", "Tech Journal, 2024", false, 0);
         testBackUpFile("backup.txt", "None"); // filename : article group/none
         testDeleteArticle("Test Title", "None"); // title : special access group/none
-        testLoadFromFile("testFile.txt", true); // filename: true to replace db/false to update db
-        testViewArticle(1, "TestUser"); // id : / username
+        testLoadFromFile("Backup1", true); // filename: true to replace db/false to update db
+        testViewArticle(59, "joebiden"); // id : / username
         testDisplayArticles();
         testIsDatabaseEmpty();
 

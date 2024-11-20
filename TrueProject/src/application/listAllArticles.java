@@ -99,11 +99,15 @@ public class listAllArticles {
 			}
         	try {
 	        	String userSpecialGroup = dbHelper.getSpecialAccessGroup(userName);
-	        	if ((!userRole.equals("Student")) && ((userSpecialGroup.equals(articleDBelper.getGroupType(sequenceNumber)) ||
-	        			dbHelper.isGroupInAdminRights(userName, articleDBelper.getGroupType(sequenceNumber)))))
-	        	{
-	        		editButton.setVisible(true);
-	        	}
+	        	if (
+	        		    (!"Student".equals(userRole)) &&
+	        		    (
+	        		        (userSpecialGroup != null && userSpecialGroup.equals(articleDBelper.getGroupType(sequenceNumber))) ||
+	        		        (articleDBelper.getGroupType(sequenceNumber) != null && dbHelper.isGroupInAdminRights(userName, articleDBelper.getGroupType(sequenceNumber)))
+	        		    )
+	        		) {
+	        		    editButton.setVisible(true);
+	        		}
 	        	else if (articleDBelper.getGroupType(sequenceNumber).equals("General Group") && (!userRole.equals("Student")))
 	        	{
         			editButton.setVisible(true);

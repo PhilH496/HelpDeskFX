@@ -24,6 +24,7 @@ public class PasswordEvaluationTestingAutomation {
 	}
 
 	static String performTestCase(int testCase, String inputText, boolean expectedPass) {
+		PasswordEvaluator.evaluatePassword(inputText);
 		String word = displayEvaluation();
 		return word;
 	}

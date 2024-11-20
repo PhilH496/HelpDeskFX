@@ -113,7 +113,7 @@ public class UserHomePage {
   	        Optional<String> messageInputResult = messageInputDialog.showAndWait();
   	        if (messageInputResult.isPresent()) {						
   	            String messageInput = messageInputResult.get();
-  	            System.out.print("Message posted: " + messageInput + " as " + messageType);
+  	            System.out.println("Message posted: " + messageInput + " as " + messageType);
   	        } else {
   	        	Label messageInputCanceled = new Label("Message type not selected");
   	        	messageInputCanceled.setTextFill(Color.RED);
