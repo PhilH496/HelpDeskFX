@@ -38,8 +38,12 @@ class articleDatabaseHelper {
 			System.err.println("JDBC Driver not found: " + e.getMessage());
 		}
 	}
-	// Used to create database table, adding necessary article items like ID, level, group title, author, 
-	// abstract, keywords, body, references
+	
+	/*
+	 *  Used to create database table, adding necessary article items such as:
+	 *  special access group, ID, level, article group, title, 
+	 *  author, abstract, keywords, body, references.
+	 */
 	public void createTables() throws SQLException {
 		String userTable = "CREATE TABLE IF NOT EXISTS cse360article ("
 				+ "groupType VARCHAR(255), "
@@ -55,7 +59,10 @@ class articleDatabaseHelper {
 		statement.execute(userTable);
 	}
 
-	// Backs up articles to a file, optionally filtered by group.
+	/*
+	 *  Stores articles data to the given filename. Articles can be selectively 
+	 *  chosen to be backed up by their article group.
+	 */
 	public boolean backUpFile(String file, String userGroup) throws Exception{
 		String sql = null;
 		 // Construct SQL based on groups
@@ -99,9 +106,12 @@ class articleDatabaseHelper {
 		return true;
 	}
 	
-	// loadFromFile loads data from a file and is passed a boolean to determine how it does so. 
-	// True will delete all existing articles and replace them with what is in the specified file.
-	// False will instead update the current database with the data from the file while skipping duplicate titles.
+	/*
+	 *  loadFromFile loads data from a file and is passed a boolean to determine how it does so. 
+	 *  True will delete all existing articles and replace them with what is in the specified file.
+	 *  False will instead update the current database with the data from the file 
+	 *  while skipping duplicate titles.
+	 */
 	public boolean loadFromFile(String file, boolean replaceAll) {
 	    String sql = "INSERT INTO cse360article (groupType, level, article_group, title, author, "
 	    		+ "abstract, keywords, body, references) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
@@ -177,8 +187,10 @@ class articleDatabaseHelper {
 	    return true;
 	}
 	
-	// deleteArticle will delete an article specified by it's given title 
-	// or delete article(s) by their group type
+	/*
+	 *  deleteArticle will delete an article specified by it's given title 
+	 *  or delete article(s) by their special access group.
+	 */  
 	public void deleteArticle(String title, String groupType) throws SQLException {
 		String sql; 
 		if (groupType.equals("None")) { // Construct sql based on given args
@@ -199,9 +211,11 @@ class articleDatabaseHelper {
 			e.printStackTrace();
 		}
 	}
+	
 	/*
-	 * displayArticles will grab every item in the database for articles and list it out dependent on what the user wants.
-	 * Besides the title, author, and id number, everything else will be encrypted and only decrypted when called upon.
+	 * viewArticle will return the article specified by the sequence number. The body and references are 
+	 * initially encrypted. The passed username will be checked to see if they have the correct
+	 * viewing rights, then the body and references will be displayed unencrypted.
 	 */
 	public String viewArticle(int sequenceNumber, String userName) throws Exception {
 		String findUserQuery = "SELECT * FROM cse360article WHERE id = ?";
@@ -292,6 +306,10 @@ class articleDatabaseHelper {
 	    return article.toString();
 	}
 	
+	/*
+	 * displayArticle will display all articles in short form(without the body or references)
+	 * and display it with proper formatting.
+	 */
 	public String displayArticles() throws Exception {
 	    StringBuilder articleDetails = new StringBuilder();
 	    StringBuilder result = new StringBuilder();
@@ -332,7 +350,9 @@ class articleDatabaseHelper {
 	    return result.toString();
 	}
 	
-	// Check if the database is empty or not
+	/*
+	 * Checks if the database is empty or not.
+	 */
 	public boolean isDatabaseEmpty() throws SQLException {
 		String query = "SELECT COUNT(*) AS count FROM cse360article";
 		ResultSet resultSet = statement.executeQuery(query);
@@ -341,18 +361,20 @@ class articleDatabaseHelper {
 		}
 		return true;
 	}
+	
 	/*
-	 *  articleCreation will just add all the parts the user specifies they want for level, group, title, author,
-	 *  abstract, keywords, body, and references and add it to the database.
+	 * Creates an article with the following arguments:
+     * Special access group, level, group, title, author, abstract, keywords, body, references,
+     * a flag that designates edit or article creation, and the article ID if it exists(depends on flag).
 	 */
 	public void articleCreation(String groupType, String level, String group, String title, String author, 
 			String abstracts, String keywords, String body, String references, boolean update, int id) {
 		String sql;
-		if (update == true) {
+		if (update == true) { // edit existing article
 			sql = "UPDATE cse360article SET groupType = ?, level = ?, article_group = ?, title = ?, " +
 		              "author = ?, abstract = ?, keywords = ?, body = ?, references = ? " +
 		              "WHERE id = " + "'" + id + "'";
-		} else {
+		} else { 			  // create new article
 			sql = "INSERT INTO cse360article (groupType, level, article_group, title, author, abstract, keywords, body, references) "
 					+ "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
 		}
@@ -373,7 +395,9 @@ class articleDatabaseHelper {
 		}
 	}
 	
-	//This portions helps to facilitate the 'search' function and query articles based on keywords
+	/*
+	 * Helper method to facilitate the 'search' function and query articles based on keywords.
+	 */
     public String searchByKeywordAndLevel(String keyword, String skillLevel) throws SQLException {
         StringBuilder articleDetails = new StringBuilder();
         StringBuilder result = new StringBuilder();
@@ -420,7 +444,10 @@ class articleDatabaseHelper {
         }
         return result.toString();
     }
-
+    
+    /*
+     * Simple utility method to close the article database connection after opening it.
+     */
 	public void closeConnection() {
 		try{ 
 			if(statement!=null) statement.close(); 
@@ -434,7 +461,11 @@ class articleDatabaseHelper {
 		} 
 	}
 	
-	//Updates the article accordingly via sequence number. Adds everything to article
+	/*
+	 * Returns article data by it's sequence number where it is then fed into the article creation GUI.
+	 * Method technically doesn't update article on it's own but instead helps to keep original
+	 * article data persistent.
+	 */
 	public String[] updateArticle(int sequenceNumber) throws Exception {
 	    String sql = "SELECT * FROM cse360article WHERE id = " + "'" + sequenceNumber + "'";
 	    String article[] = new String[9];
@@ -464,8 +495,10 @@ class articleDatabaseHelper {
 		}
 		return article;
 	}
-	
-	//Gets the groupType of the user as either general or specific special group
+
+	/*
+	 * Returns the special access group (groupType) of the user as either general or specific special group.
+	 */
 	public String getGroupType(int articleId) throws SQLException {
 	    String groupType = null;
 	    String sql = "SELECT groupType FROM cse360article WHERE id = ?";
@@ -482,5 +515,4 @@ class articleDatabaseHelper {
 	    }
 	    return groupType;
 	}
-
 }

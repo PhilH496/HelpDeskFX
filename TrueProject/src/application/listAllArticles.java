@@ -196,7 +196,10 @@ public class listAllArticles {
         return -1; // Return -1 if no input was provided
     }
     
-    //Ability to edit article and change anything about it
+    /*
+     * Private method that allows the user to edit existing articles and maintain
+     * persistent data between edits.
+     */
     private void editArticle(Stage primaryStage, String userRole, String userName, int sequenceNumber) throws Exception {
     	String article[] = articleDBelper.updateArticle(sequenceNumber); 
     	
@@ -293,6 +296,5 @@ public class listAllArticles {
         		keywordsField, bodyArea, referencesArea, horizontalLayoutForButtons, submitButton, backButton);
 
         primaryStage.setScene(new Scene(createBox, 600, 600));
-		
 	}
 }

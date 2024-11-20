@@ -19,8 +19,9 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 /*
- * This portion is the article management GUI page that sets up the buttons and
- * actions for what each button does and should do
+ * This class creates the primary GUI stage for all functions related to 
+ * article management including:
+ * article creation, deletion, back ups, restoring back ups.
  */
 
 public class articleManagement {

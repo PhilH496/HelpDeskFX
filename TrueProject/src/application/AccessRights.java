@@ -84,7 +84,10 @@ public class AccessRights {
         return new Scene(cb, 600, 600);
 	}
 	
-	//Deletes access to user
+	/*
+	 * Private method that deletes the special access group of a user,
+	 * revoking their viewing/admin rights of their owned group while retaining other permissions.
+	 */
 	private void deleteAccess() throws SQLException {
 		// Dialog to prompt the user to enter the ID of the user wish to send to the help system
   	   	TextInputDialog idInputDialog = new TextInputDialog();

@@ -117,12 +117,15 @@ public class AdminHomePage {
         
         VBox contentBox = new VBox(20);
         contentBox.setAlignment(Pos.TOP_CENTER);
-        contentBox.getChildren().addAll(header, inviteUser, passReset, deleteUser, listUsers, changeUserRoleButton, articleButton);
+        contentBox.getChildren().addAll(header, inviteUser, passReset, deleteUser, listUsers, 
+        		changeUserRoleButton, articleButton);
 
         return new Scene(contentBox, 600, 600);
     }
     
-    // Method to handle the deletion of a user's account
+    /*
+     *  Method to handle the deletion of a user's account given their username.
+     */
     public static void deleteUser() {
     	TextInputDialog text = new TextInputDialog();
     	text.setContentText("Please enter the username to delete their account:");
@@ -160,7 +163,9 @@ public class AdminHomePage {
         });
     }
     
-    // Method to display all users in a TableView object
+    /*
+     *  Private method to display all users with 2 data fields: their ID and username.
+     */
     private static void displayUsers(Stage primaryStage, String name) {
     	try {
     		databaseHelper.connectToDatabase();  
@@ -196,16 +201,18 @@ public class AdminHomePage {
 		}
     }
     
-    // Method to update user role in the database
+    /*
+     * Private method to invite a user to the help system, creating an account for them.
+     */
   	private void inviteUser() {
   	    String password = PassReset.generateOTP();
-
+  	    
   	    List<String> roles = new ArrayList<>();
   	    roles.add("Student");
   	    roles.add("Instructor");
 
-  	    ChoiceDialog<String> type = new ChoiceDialog<>("Student", roles);
-  	    type.setContentText("Select a role:");
+  	    ChoiceDialog<String> type = new ChoiceDialog<>("Student", roles); // ChoiceDialog only accepts 
+  	    type.setContentText("Select a role:");							  // lists as second arg.
 
   	    TextInputDialog emailTalk = new TextInputDialog();
   	    emailTalk.setHeaderText("Enter the email of the user you wish to invite:");
@@ -218,7 +225,8 @@ public class AdminHomePage {
   	        if (out.isPresent()) {
   	            String role = out.get();
 
-  	            // Register the user with the provided username, generated password, and selected role
+  	            // Register the user with the provided username, a randomly generated password, 
+  	            // the default General group and the admin selected role.
   	            try {
   	                databaseHelper.connectToDatabase();
   	                databaseHelper.register(email, password, role);
@@ -239,7 +247,11 @@ public class AdminHomePage {
   	    }
   	}
   	
-  	// Method to handle user role change process
+  	/*
+     * Private method to update a user's role in the database 
+     * by prompting for the user's email and the role the admin 
+     * wishes to change them to.
+     */
   	private void changeUserRole() {
   	    List<String> roles = new ArrayList<>();
   	    roles.add("Student");
@@ -279,10 +291,12 @@ public class AdminHomePage {
   	    }
   	}
   	
-  	// Method to update user role in the database
+  	/*
+  	 *  Private method that directly edits the user database with the specified user role
+  	 *  TODO: Integrate into DatabaseHelper.java
+  	 */
   	private void updateUserRole(String role, String username) {
   		String sql = "UPDATE cse360users SET role = ? WHERE email = ?";
-
         try {
             databaseHelper.connectToDatabase();
             try (PreparedStatement pstmt = databaseHelper.getConnection().prepareStatement(sql)) {
@@ -306,4 +320,5 @@ public class AdminHomePage {
             databaseHelper.closeConnection();
         }
   	}
+  	
 }

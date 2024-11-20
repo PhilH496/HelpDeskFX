@@ -83,11 +83,6 @@ public class InstructorPage {
         removeButton.setOnAction(e -> {
         	removeStudent();
         });
- 
-        //commented out part for future
-      /*  VBox activityList = new VBox(10);
-        activityList.setPadding(new Insets(200));
-        activityList.setStyle("-fx-background-color: white; -fx-border-color: #e0e0e0; -fx-border-radius: 5;");*/
         
         // Box layout
         mainContent.setAlignment(Pos.TOP_CENTER);
@@ -103,7 +98,10 @@ public class InstructorPage {
         
         return new Scene(contentBox, 800, 600);
     }
-    //gets the preferred name for display
+    
+    /*
+     * Returns the user's preferred name by their username.
+     */
     private String getPrefName(String username) throws SQLException {
         DatabaseHelper db = new DatabaseHelper();
         db.connectToDatabase();
@@ -112,6 +110,9 @@ public class InstructorPage {
         return prefName;
     }
     
+    /*
+     * Displays all users of the 'Student' role with their ID and username.
+     */
     private static void displayStudents(Stage primaryStage, String username) {
     	try {
     		databaseHelper.connectToDatabase();  
@@ -151,6 +152,10 @@ public class InstructorPage {
 		}
     }
     
+    /*
+     * Account creation for students with a randomly generated password 
+     * and a prompt for the potential user's email.
+     */
     private void inviteStudent() {
   	    String password = PassReset.generateOTP();
 
@@ -177,6 +182,9 @@ public class InstructorPage {
   	    }
   	}
     
+    /*
+     * Account deletion for users with the 'Student' role given by their username.
+     */
     public static void removeStudent() {
     	TextInputDialog text = new TextInputDialog();
     	text.setContentText("Please enter the student's username to remove them from the help system:");
@@ -213,5 +221,4 @@ public class InstructorPage {
         	}
         });
     }
-    
 }

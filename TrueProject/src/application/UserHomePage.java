@@ -81,7 +81,9 @@ public class UserHomePage {
         return new Scene(contentBox, 800, 600);
     }
     
-    // Private method to get the preferred name of the user to display on their homepage
+    /*
+     *  Private method to get the preferred name of the user to display on their homepage
+     */
     private String getPrefName(String username) throws SQLException {
         DatabaseHelper db = new DatabaseHelper();
         db.connectToDatabase();
@@ -90,7 +92,9 @@ public class UserHomePage {
         return prefName;
     }
     
-    // Private method that prompts the user to specify a message type then send a message to the help system
+    /*
+     *  Private method that prompts the user to specify a message type then send a message to the help system
+     */
     private void sendMessage() {
     	// Dialog to prompt the user to tag their message as Generic or Specific
     	List<String> messageOptions = new ArrayList<>();
