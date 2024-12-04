@@ -26,12 +26,12 @@ public class articleDatabaseAutomatedTesting {
         // special access group : level : article group : title : author : abstract 
         // : keywords : body : references : edit existing/create new : id/none
         testArticleCreation("Eclipse Tutorials", "Intermediate", "Eclipse", "How to use Eclipse", "John Doe",
-                "This article discusses Eclipse.", "Eclipse, IDE, Technology",
+               "This article discusses Eclipse.", "Eclipse, IDE, Technology",
                 "Here are a bunch of tips and tricks to learn when using Eclipse.", "Tech Journal, 2024", false, 0);
         testBackUpFile("backup.txt", "None"); // filename : article group/none
         testDeleteArticle("Test Title", "None"); // title : special access group/none
         testLoadFromFile("Backup1", true); // filename: true to replace db/false to update db
-        testViewArticle(59, "joebiden"); // id : / username
+        testViewArticle(3, "admin"); // id : / username
         testDisplayArticles();
         testIsDatabaseEmpty();
 
