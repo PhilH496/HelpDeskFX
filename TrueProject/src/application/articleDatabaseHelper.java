@@ -254,6 +254,7 @@ class articleDatabaseHelper {
     		            EncryptionUtils.getInitializationVector(author.toCharArray())
     		        ));      
     	        
+    		        
                 DatabaseHelper databaseHelp = new DatabaseHelper();
                 databaseHelp.connectToDatabase();
                 String userGroupType = databaseHelp.getSpecialAccessGroup(userName);
@@ -514,5 +515,22 @@ class articleDatabaseHelper {
 	        System.out.println("Error retrieving groupType: " + e.getMessage());
 	    }
 	    return groupType;
+	}
+	
+	public int getArticleId(String title) {
+	    String sql = "SELECT id FROM cse360article WHERE title = ?";
+	    try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
+	        pstmt.setString(1, title);
+	        ResultSet rs = pstmt.executeQuery();
+	        if (rs.next()) {
+	            return rs.getInt("id"); 
+	        } else {
+	            System.out.println("Article not found with the given title: " + title);
+	            return -1; 
+	        }
+	    } catch (SQLException e) {
+	        e.printStackTrace();
+	        return -1; 
+	    }
 	}
 }

@@ -97,32 +97,59 @@ class DatabaseHelper {
 	}
 
 	//Displays all users along with their roles, rights, etc.
-	public void displayUsersByAdmin() throws SQLException{
-		String sql = "SELECT * FROM cse360users"; 
-		Statement stmt = connection.createStatement();
-		ResultSet rs = stmt.executeQuery(sql); 
+	public void displayUsersByAdmin(String username) throws SQLException {
+	    String sql;
+	    PreparedStatement pstmt = null;
 
-		while(rs.next()) { 
-			// Retrieve by column name 
-			int id = rs.getInt("id"); 
-			String username = rs.getString("username"); 
-			String password = rs.getString("password"); 
-			String role = rs.getString("role");  
-			String specialGroup = rs.getString("specialAccessGroup");
-			String viewingRights = rs.getString("viewingRights");
-			String adminRights = rs.getString("adminRights");
+	    if (username == null || username.trim().isEmpty()) {
+	        // Display all users
+	        sql = "SELECT * FROM cse360users";
+	        pstmt = connection.prepareStatement(sql);
+	    } else {
+	        // Display a specific user
+	        sql = "SELECT * FROM cse360users WHERE username = ?";
+	        pstmt = connection.prepareStatement(sql);
+	        pstmt.setString(1, username);
+	    }
 
-			// Display values 
-			System.out.print("ID: " + id); 
-			System.out.print(", Username: " + username); 
-			System.out.print(", Password: " + password); 
-			System.out.println(", Role: " + role + ", "); 
-			System.out.println("Special Access Group: " + specialGroup);
-			System.out.println("ViewingRights: " + viewingRights);
-			System.out.println("AdminRights: " + adminRights);
-			System.out.println();
-		} 
+	    try (ResultSet rs = pstmt.executeQuery()) {
+	        boolean hasResults = false;
+
+	        while (rs.next()) {
+	            hasResults = true;
+
+	            // Retrieve by column name
+	            int id = rs.getInt("id");
+	            String user = rs.getString("username");
+	            String password = rs.getString("password");
+	            String role = rs.getString("role");
+	            String specialGroup = rs.getString("specialAccessGroup");
+	            String viewingRights = rs.getString("viewingRights");
+	            String adminRights = rs.getString("adminRights");
+
+	            // Display values
+	            System.out.println("ID: " + id);
+	            System.out.println("Username: " + user);
+	            System.out.println("Password: " + password);
+	            System.out.println("Role: " + role);
+	            System.out.println("Special Access Group: " + specialGroup);
+	            System.out.println("Viewing Rights: " + viewingRights);
+	            System.out.println("Admin Rights: " + adminRights);
+	            System.out.println();
+	        }
+
+	        if (!hasResults) {
+	            System.out.println(username == null || username.trim().isEmpty()
+	                ? "No users found."
+	                : "No user found with username: " + username);
+	        }
+	    } finally {
+	        if (pstmt != null) pstmt.close();
+	    }
 	}
+
+	
+	
 	
 	// Method to return all users stored in the database into an ArrayList
 	public ArrayList<User> getAllUsers(String specifiedRole) throws SQLException{

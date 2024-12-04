@@ -33,7 +33,7 @@ public class Main extends Application {
                 System.out.println("Database already contains users. Registering additional user...");
             }
             System.out.println("========== START OF ADMIN VIEW ==========");
-            dbHelper.displayUsersByAdmin();
+            dbHelper.displayUsersByAdmin(null);
             System.out.println("========== END OF ADMIN VIEW ==========");
         } catch (Exception e) {
             e.printStackTrace();

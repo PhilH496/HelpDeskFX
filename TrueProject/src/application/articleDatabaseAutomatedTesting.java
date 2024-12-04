@@ -237,7 +237,7 @@ public class articleDatabaseAutomatedTesting {
      * Special access group, level, group, title, author, abstract, keywords, body, references,
      * a flag that designates edit or article creation, and the article ID if it exists.
      */
-    private static void testArticleCreation(String groupType, String level, String group, String title, String author,
+    public static void testArticleCreation(String groupType, String level, String group, String title, String author,
             String abstracts, String keywords, String body, String references, boolean update, int id) {
         System.out.println("-------------------------------------");
         System.out.println("Test: articleCreation");
